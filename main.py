@@ -489,9 +489,9 @@ def require_api_key(f):
 # API ENDPOINTS
 # ============================================================================
 
-@app.route('/', methods=['GET'])
+@app.route('/', methods=['GET', 'POST', 'HEAD'])
 def root():
-    """Root health check - GET only, no body, no JSON parsing"""
+    """Root health check - accepts GET, POST, HEAD - returns 200 OK with JSON"""
     return jsonify({
         "status": "ok",
         "service": "agentic-honeypot",
