@@ -364,7 +364,7 @@ def require_api_key(f):
         return f(*args, **kwargs)
     return decorated_function
 
-@app.route('/', methods=['GET'])
+@app.route('/', methods=['GET', 'POST'])
 def root():
     """Root endpoint for deployment health checks"""
     return jsonify({
