@@ -3,7 +3,7 @@ Agentic Honeypot - Complete Production API
 A sophisticated scam detection and engagement system using autonomous agents
 """
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Request
 from flask_cors import CORS
 from datetime import datetime
 import uuid
@@ -11,17 +11,20 @@ import logging
 import re
 import random
 import threading
+import json
 from enum import Enum
 from dataclasses import dataclass, field, asdict
 from typing import List, Dict, Optional, Tuple
 from collections import defaultdict
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import BadRequest, HTTPException
+from werkzeug.datastructures import Headers
 
 # Initialize Flask app
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
-app.config['PROPAGATE_EXCEPTIONS'] = True
-CORS(app, supports_credentials=True)
+app.config['PROPAGATE_EXCEPTIONS'] = False  # Important: don't propagate, handle gracefully
+app.config['JSON_AS_ASCII'] = False
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -31,6 +34,33 @@ logger = logging.getLogger(__name__)
 API_KEY = "test_key_12345"  # Use this for X-API-Key header
 MAX_CONVERSATIONS = 1000
 CONVERSATION_TIMEOUT_MINUTES = 120
+
+# ============================================================================
+# CUSTOM REQUEST HANDLING - Parse JSON safely
+# ============================================================================
+class SafeRequest(Request):
+    """Custom Request class that never throws JSON parsing errors"""
+    
+    @property
+    def json(self):
+        """Override to safely get JSON without throwing errors"""
+        try:
+            if self.is_json:
+                return self.get_json(force=False, silent=True)
+        except Exception as e:
+            logger.warning(f"JSON parse error: {str(e)}")
+        return None
+    
+    def get_json(self, force=False, silent=False, cache=True):
+        """Override to never raise BadRequest"""
+        try:
+            return super().get_json(force=force, silent=True, cache=cache)
+        except Exception as e:
+            logger.warning(f"JSON parse error in get_json: {str(e)}")
+            return None
+
+# Use custom request class
+app.request_class = SafeRequest
 
 # ============================================================================
 # SCAM DETECTION ENGINE
@@ -435,9 +465,14 @@ memory_manager = MemoryManager()
 
 @app.before_request
 def handle_preflight():
+    """Handle all preflight and setup"""
     # Handle CORS preflight
     if request.method == 'OPTIONS':
-        return jsonify({"status": "ok"}), 200
+        return jsonify({"status": "ok"}), 200, {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH,HEAD,OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type,X-API-Key,Authorization'
+        }
 
 
 
@@ -451,6 +486,69 @@ def require_api_key(f):
             return jsonify({"error": "Unauthorized", "message": "Invalid or missing API key"}), 401
         return f(*args, **kwargs)
     return decorated_function
+
+# ============================================================================
+# ERROR HANDLERS - Catch ALL errors and return valid JSON
+# ============================================================================
+
+@app.errorhandler(400)
+def handle_400(e):
+    """Handle 400 Bad Request"""
+    return jsonify({
+        "error": "Bad Request",
+        "message": "The request could not be processed"
+    }), 400
+
+@app.errorhandler(401)
+def handle_401(e):
+    """Handle 401 Unauthorized"""
+    return jsonify({
+        "error": "Unauthorized",
+        "message": "Invalid or missing authentication"
+    }), 401
+
+@app.errorhandler(404)
+def handle_404(e):
+    """Handle 404 Not Found"""
+    return jsonify({
+        "error": "Not Found",
+        "message": "The requested endpoint does not exist"
+    }), 404
+
+@app.errorhandler(405)
+def handle_405(e):
+    """Handle 405 Method Not Allowed"""
+    return jsonify({
+        "error": "Method Not Allowed",
+        "message": f"The {request.method} method is not allowed for this endpoint"
+    }), 405
+
+@app.errorhandler(500)
+def handle_500(e):
+    """Handle 500 Internal Server Error"""
+    logger.error(f"Internal server error: {str(e)}")
+    return jsonify({
+        "error": "Internal Server Error",
+        "message": "An unexpected error occurred"
+    }), 500
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    """Catch ALL unhandled exceptions and return valid JSON"""
+    logger.error(f"Unhandled exception: {type(e).__name__}: {str(e)}")
+    
+    # If it's an HTTP exception, use its status code
+    if isinstance(e, HTTPException):
+        return jsonify({
+            "error": e.name,
+            "message": e.description
+        }), e.code
+    
+    # For all other exceptions, return 500
+    return jsonify({
+        "error": "Internal Server Error",
+        "message": "An unexpected error occurred"
+    }), 500
 
 
 
@@ -469,7 +567,7 @@ def health_check():
 def detect_scam():
     """Detect if message is a scam"""
     try:
-        data = request.get_json(silent=True)
+        data = request.get_json(force=False, silent=True)
         
         if not data or 'message' not in data:
             return jsonify({"error": "Missing required field: message"}), 400
@@ -484,14 +582,14 @@ def detect_scam():
     
     except Exception as e:
         logger.error(f"Error in detect_scam: {str(e)}")
-        return jsonify({"error": "Internal server error", "details": str(e)}), 500
+        return jsonify({"error": "Internal server error"}), 500
 
 @app.route('/api/v1/conversation', methods=['POST'])
 @require_api_key
 def create_conversation():
     """Create new conversation"""
     try:
-        data = request.get_json(silent=True) or {}
+        data = request.get_json(force=False, silent=True) or {}
         persona_name = data.get('persona_name', 'victim_001')
         
         conversation_id = str(uuid.uuid4())
@@ -505,14 +603,14 @@ def create_conversation():
     
     except Exception as e:
         logger.error(f"Error creating conversation: {str(e)}")
-        return jsonify({"error": "Internal server error", "details": str(e)}), 500
+        return jsonify({"error": "Internal server error"}), 500
 
 @app.route('/api/v1/conversation/<conversation_id>/message', methods=['POST'])
 @require_api_key
 def process_message(conversation_id):
     """Process scammer message and get agent response"""
     try:
-        data = request.get_json(silent=True)
+        data = request.get_json(force=False, silent=True)
 
         
         if not data or 'message' not in data:
@@ -577,7 +675,7 @@ def process_message(conversation_id):
     
     except Exception as e:
         logger.error(f"Error processing message: {str(e)}")
-        return jsonify({"error": "Internal server error", "details": str(e)}), 500
+        return jsonify({"error": "Internal server error"}), 500
 
 @app.route('/api/v1/conversation/<conversation_id>', methods=['GET'])
 @require_api_key
@@ -593,27 +691,7 @@ def get_conversation(conversation_id):
     
     except Exception as e:
         logger.error(f"Error getting conversation: {str(e)}")
-        return jsonify({"error": "Internal server error", "details": str(e)}), 500
-
-@app.errorhandler(404)
-def not_found(error):
-    """Handle 404 errors"""
-    return jsonify({"error": "Endpoint not found"}), 404
-
-@app.errorhandler(405)
-def method_not_allowed(error):
-    """Handle 405 errors"""
-    return jsonify({"error": "Method not allowed"}), 405
-
-@app.errorhandler(BadRequest)
-def handle_bad_request(e):
-    return jsonify({"error": "Bad Request", "message": "Invalid JSON"}), 400
-
-@app.errorhandler(500)
-def internal_error(error):
-    return jsonify({
-        "error": "Internal server error"
-    }), 500
+        return jsonify({"error": "Internal server error"}), 500
 
 
 # ============================================================================
