@@ -1,0 +1,180 @@
+DEPLOYMENT INSTRUCTIONS FOR VERCEL
+===================================
+
+STEP 1: Go to Vercel
+- Visit https://vercel.com
+- Sign in with your GitHub account
+
+STEP 2: Import Project
+- Click "Add New" then "Project"
+- Click "Import Git Repository"
+- Select "hariharanm-ds/Agentic-Honeypot"
+- Click "Import"
+
+STEP 3: Configure Project
+- Framework: Flask (auto-detected)
+- Root Directory: ./
+- Environment Variables: (can skip, defaults already set)
+- Click "Deploy"
+
+STEP 4: Wait for Deployment
+- Watch the build logs
+- Deployment takes 3-5 minutes
+- You'll see "Ready" when complete
+
+STEP 5: Get Your Live URL
+- Copy the URL from the dashboard
+- Format: https://[project-name].vercel.app
+
+STEP 6: Update Frontend (Important!)
+- Open advanced_ui.html
+- Find: const API_BASE = 'http://localhost:5000';
+- Change to: const API_BASE = 'https://[your-vercel-url]';
+- Save and commit: git add advanced_ui.html && git commit -m "Update API URL" && git push
+- Vercel auto-redeploys from GitHub
+
+THAT'S IT! Your app is live!
+
+---
+
+ALTERNATIVE: RAILWAY.APP (Recommended)
+=====================================
+
+STEP 1: Go to Railway
+- Visit https://railway.app
+- Sign in with GitHub
+
+STEP 2: Create Project
+- Click "New Project"
+- Select "Deploy from GitHub"
+- Authorize Railway
+- Select "Agentic-Honeypot"
+- Click "Deploy"
+
+STEP 3: Wait for Build
+- Railway detects Dockerfile automatically
+- Build takes 2-3 minutes
+- Generates live URL automatically
+
+STEP 4: Get Your Live URL
+- Copy URL from Railway dashboard
+- Format: https://[app-name].railway.app
+
+STEP 5: Update Frontend
+- Open advanced_ui.html
+- Find: const API_BASE = 'http://localhost:5000';
+- Change to: const API_BASE = 'https://[your-railway-url]';
+- Save and commit: git add advanced_ui.html && git commit -m "Update API URL" && git push
+- Railway auto-redeploys
+
+DONE!
+
+---
+
+TROUBLESHOOTING
+===============
+
+If Vercel deployment fails:
+1. Check build logs for errors
+2. Verify wsgi.py exists in root directory
+3. Verify requirements.txt has all dependencies
+4. Try deleting and redeploying
+
+If API connection fails:
+1. Check the URL in advanced_ui.html is correct
+2. Verify no typos
+3. Check CORS is enabled (it is)
+4. Verify X-API-Key header is being sent
+
+If scam detection times out on Vercel:
+- Vercel has 30-second limit
+- Use Railway instead (no time limit)
+
+---
+
+FILES IN THIS PROJECT
+====================
+
+Core Application:
+- src/api.py - Flask REST API
+- src/scam_detector.py - Scam detection engine
+- src/persona.py - Persona system
+- src/conversation_engine.py - Conversation management
+- src/agent_controller.py - Agent logic
+- src/intelligence_extractor.py - Data extraction
+- src/memory_store.py - Memory management
+
+Frontend:
+- advanced_ui.html - Professional web interface
+- index.html - Basic HTML
+
+Deployment:
+- Dockerfile - Docker configuration
+- wsgi.py - Vercel entry point
+- vercel.json - Vercel configuration
+- pyproject.toml - Python metadata
+- requirements.txt - Python dependencies
+
+Configuration:
+- .env - Development settings
+- .env.production - Production settings
+
+Tests:
+- comprehensive_test.py
+- integration_test.py
+- quickstart_test.py
+
+---
+
+API ENDPOINTS
+=============
+
+POST /api/v1/conversation
+- Create new conversation
+
+POST /api/v1/conversation/{id}/message
+- Send message to conversation
+
+GET /api/v1/conversation/{id}
+- Get conversation details
+
+GET /api/v1/conversation/{id}/export
+- Export conversation
+
+DELETE /api/v1/conversation/{id}
+- Delete conversation
+
+GET /health
+- API health check
+
+All endpoints require X-API-Key header (test_key_12345 for local testing)
+
+---
+
+GITHUB REPOSITORY
+=================
+
+https://github.com/hariharanm-ds/Agentic-Honeypot
+
+Repository contains:
+- Complete backend (7 Python modules)
+- Professional frontend (2000+ lines)
+- Deployment configurations (Vercel + Railway)
+- Tests and examples
+
+---
+
+SUPPORT
+=======
+
+For issues:
+1. Check deployment logs
+2. Review error messages
+3. Verify all files exist
+4. Try redeploying
+
+Questions?
+- Check vercel.json and wsgi.py
+- Ensure requirements.txt is complete
+- Verify Flask app is in src/api.py
+
