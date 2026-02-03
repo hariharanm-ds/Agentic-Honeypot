@@ -443,20 +443,21 @@ def require_api_key(f):
 
 @app.route('/', methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'])
 def root():
-    """Root endpoint for deployment health checks - accepts all methods"""
-    # Handle POST/PUT requests with optional JSON body
-    if request.method in ['POST', 'PUT', 'PATCH']:
-        try:
-            # Try to parse JSON body if present
-            data = request.get_json(silent=True) or {}
-        except Exception:
-            data = {}
+    """Root endpoint for deployment health checks - accepts all methods and any body"""
+    try:
+        # Attempt to read any body content (JSON, form, plain text, or none)
+        if request.method in ['POST', 'PUT', 'PATCH']:
+            # Get raw data if JSON fails
+            _ = request.get_data(as_text=True)
+    except Exception as e:
+        pass  # Ignore any body parsing errors
     
+    # Always return success
     return jsonify({
         "status": "ok",
         "service": "agentic-honeypot",
         "version": "1.0",
-        "message": "Honeypot service is running"
+        "timestamp": datetime.now().isoformat()
     }), 200
 
 @app.route('/health', methods=['GET'])
