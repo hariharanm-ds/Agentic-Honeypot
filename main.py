@@ -528,7 +528,13 @@ def handle_404(e):
 
 @app.errorhandler(405)
 def handle_405(e):
-    """Handle 405 Method Not Allowed"""
+    """Handle 405 Method Not Allowed - convert to 200 for root endpoint"""
+    if request.path == '/':
+        return jsonify({
+            "status": "ok",
+            "service": "agentic-honeypot",
+            "version": "1.0"
+        }), 200
     return jsonify({
         "error": "Method Not Allowed",
         "message": f"The {request.method} method is not allowed for this endpoint"
