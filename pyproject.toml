@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "agentic-honeypot"
+version = "1.0.0"
+description = "Advanced AI-powered honeypot system for scam detection with professional web interface"
+authors = ["Agentic Honeypot Team"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+flask = "^2.3.3"
+flask-cors = "^4.0.0"
+requests = "^2.31.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.vercel]
+runtime = "python3.11"
+handler = "wsgi.app"
