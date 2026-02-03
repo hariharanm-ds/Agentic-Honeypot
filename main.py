@@ -18,7 +18,9 @@ from collections import defaultdict
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app)
+app.config['JSON_SORT_KEYS'] = False
+app.config['PROPAGATE_EXCEPTIONS'] = True
+CORS(app, supports_credentials=True)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -429,6 +431,16 @@ memory_manager = MemoryManager()
 # ============================================================================
 # API ENDPOINTS
 # ============================================================================
+
+@app.before_request
+def handle_preflight():
+    """Handle preflight requests and invalid bodies gracefully"""
+    if request.method == 'OPTIONS':
+        response = jsonify({"status": "ok"})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,X-API-Key')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,HEAD,OPTIONS')
+        return response, 200
 
 def require_api_key(f):
     """Decorator to require API key"""
