@@ -1,6 +1,6 @@
 """
 WSGI Entry Point for Production Deployment
-Comprehensive error handling at WSGI level
+Comprehensive error handling at WSGI level - ROOT PATH PRIORITY
 """
 
 from main import app
@@ -12,21 +12,19 @@ logger = logging.getLogger(__name__)
 class ProductionMiddleware:
     """
     Production-grade WSGI middleware that:
-    1. Handles root path with pure WSGI (no Flask parsing)
-    2. Ensures ALL responses are valid JSON
-    3. Never returns HTML error pages
-    4. Handles all edge cases gracefully
+    1. FIRST: Handle root path with pure WSGI (zero Flask involvement)
+    2. Then: Pass all other requests to Flask
+    3. Always: Return valid JSON, never HTML
     """
     def __init__(self, app):
         self.app = app
     
     def __call__(self, environ, start_response):
-        path = environ.get('PATH_INFO', '').rstrip('/')
-        method = environ.get('REQUEST_METHOD', 'GET')
+        path = environ.get('PATH_INFO', '').rstrip('/') or '/'
         
         try:
-            # Handle root path with pure WSGI (no JSON parsing attempt)
-            if not path or path == '':
+            # PRIORITY: Handle root path FIRST at WSGI level (no Flask parsing)
+            if path in ['/', ''] or not path.strip('/'):
                 status = '200 OK'
                 response_body = json.dumps({
                     "status": "ok",
@@ -47,12 +45,12 @@ class ProductionMiddleware:
                 start_response(status, headers)
                 return [response_body]
             
-            # For all other paths, use Flask
+            # For all other paths, pass to Flask
             return self.app(environ, start_response)
         
         except Exception as e:
-            # Catch ANY error and return valid JSON
-            logger.error(f"WSGI middleware error: {type(e).__name__}: {str(e)}")
+            # Catch ANY error at WSGI level and return valid JSON
+            logger.error(f"WSGI error: {type(e).__name__}: {str(e)}")
             status = '500 Internal Server Error'
             response_body = json.dumps({
                 "error": "Internal Server Error",
@@ -67,7 +65,7 @@ class ProductionMiddleware:
             start_response(status, headers)
             return [response_body]
 
-# Apply middleware at the outermost level
+# CRITICAL: Apply middleware BEFORE Flask processes anything
 app.wsgi_app = ProductionMiddleware(app.wsgi_app)
 
 if __name__ == "__main__":

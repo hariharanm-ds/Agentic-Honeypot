@@ -460,12 +460,17 @@ intelligence_extractor = IntelligenceExtractor()
 memory_manager = MemoryManager()
 
 # ============================================================================
-# API ENDPOINTS
+# REQUEST HANDLERS - MUST BE BEFORE ROUTES
 # ============================================================================
 
 @app.before_request
 def handle_preflight():
     """Handle all preflight and setup"""
+    # Disable JSON parsing for root path
+    if request.path == '/':
+        # Completely bypass Flask's JSON parsing
+        request.environ['CONTENT_TYPE'] = 'text/plain'
+    
     # Handle CORS preflight
     if request.method == 'OPTIONS':
         return jsonify({"status": "ok"}), 200, {
@@ -473,8 +478,6 @@ def handle_preflight():
             'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH,HEAD,OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type,X-API-Key,Authorization'
         }
-
-
 
 def require_api_key(f):
     """Decorator to require API key"""
@@ -486,6 +489,19 @@ def require_api_key(f):
             return jsonify({"error": "Unauthorized", "message": "Invalid or missing API key"}), 401
         return f(*args, **kwargs)
     return decorated_function
+
+# ============================================================================
+# API ENDPOINTS
+# ============================================================================
+
+@app.route('/', methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'])
+def root():
+    """Root health check - accepts ANY method, ANY body, returns JSON"""
+    return jsonify({
+        "status": "ok",
+        "service": "agentic-honeypot",
+        "version": "1.0"
+    }), 200
 
 # ============================================================================
 # ERROR HANDLERS - Catch ALL errors and return valid JSON
@@ -549,7 +565,6 @@ def handle_exception(e):
         "error": "Internal Server Error",
         "message": "An unexpected error occurred"
     }), 500
-
 
 
 @app.route('/health', methods=['GET'])
