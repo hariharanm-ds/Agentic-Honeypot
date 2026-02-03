@@ -465,17 +465,12 @@ memory_manager = MemoryManager()
 
 @app.before_request
 def handle_preflight():
-    """Handle all preflight and setup"""
-    # Disable JSON parsing for root path
-    if request.path == '/':
-        # Completely bypass Flask's JSON parsing
-        request.environ['CONTENT_TYPE'] = 'text/plain'
-    
+    """Handle CORS preflight only"""
     # Handle CORS preflight
     if request.method == 'OPTIONS':
         return jsonify({"status": "ok"}), 200, {
             'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH,HEAD,OPTIONS',
+            'Access-Control-Allow-Methods': 'GET,POST,HEAD,OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type,X-API-Key,Authorization'
         }
 
@@ -494,9 +489,9 @@ def require_api_key(f):
 # API ENDPOINTS
 # ============================================================================
 
-@app.route('/', methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'])
+@app.route('/', methods=['GET'])
 def root():
-    """Root health check - accepts ANY method, ANY body, returns JSON"""
+    """Root health check - GET only, no body, no JSON parsing"""
     return jsonify({
         "status": "ok",
         "service": "agentic-honeypot",
