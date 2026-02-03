@@ -364,9 +364,9 @@ def require_api_key(f):
         return f(*args, **kwargs)
     return decorated_function
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'])
 def root():
-    """Root endpoint for deployment health checks"""
+    """Root endpoint for deployment health checks - accepts all methods"""
     return jsonify({
         "status": "ok",
         "service": "agentic-honeypot",
