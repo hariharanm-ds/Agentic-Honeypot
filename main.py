@@ -518,6 +518,11 @@ def not_found(error):
     """Handle 404 errors"""
     return jsonify({"error": "Endpoint not found"}), 404
 
+@app.errorhandler(405)
+def method_not_allowed(error):
+    """Handle 405 errors"""
+    return jsonify({"error": "Method not allowed"}), 405
+
 @app.errorhandler(500)
 def internal_error(error):
     """Handle 500 errors"""
