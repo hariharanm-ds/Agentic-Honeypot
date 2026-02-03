@@ -435,15 +435,13 @@ memory_manager = MemoryManager()
 
 @app.before_request
 def handle_preflight():
+    # Handle CORS preflight
     if request.method == 'OPTIONS':
-        response = jsonify({"status": "ok"})
-        response.headers.add('Access-Control-Allow-Origin', '*')
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type, X-API-Key')
-        response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
-        return response
+        return jsonify({"status": "ok"}), 200
 
-    # NEVER try to parse JSON for root endpoint
+    # HARD BYPASS JSON parsing for root
     if request.path == '/':
+        request._cached_json = {}
         return None
 
 
@@ -459,14 +457,14 @@ def require_api_key(f):
         return f(*args, **kwargs)
     return decorated_function
 
-@app.route('/', methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'])
+@app.route('/', methods=['GET'])
 def root():
     return jsonify({
         "status": "ok",
         "service": "agentic-honeypot",
-        "version": "1.0",
-        "note": "Use /api/v1/* endpoints for API operations"
+        "note": "Use /api/v1/* endpoints"
     }), 200
+
 
 
 @app.route('/health', methods=['GET'])
@@ -484,7 +482,8 @@ def health_check():
 def detect_scam():
     """Detect if message is a scam"""
     try:
-        data = request.get_json()
+        data = request.get_json(silent=True)
+
         
         if not data or 'message' not in data:
             return jsonify({"error": "Missing required field: message"}), 400
@@ -506,7 +505,7 @@ def detect_scam():
 def create_conversation():
     """Create new conversation"""
     try:
-        data = request.get_json() or {}
+        data = request.get_json(silent=True) or {}
         persona_name = data.get('persona_name', 'victim_001')
         
         conversation_id = str(uuid.uuid4())
@@ -527,7 +526,8 @@ def create_conversation():
 def process_message(conversation_id):
     """Process scammer message and get agent response"""
     try:
-        data = request.get_json()
+        data = request.get_json(silent=True)
+
         
         if not data or 'message' not in data:
             return jsonify({"error": "Missing required field: message"}), 400
@@ -629,9 +629,10 @@ def handle_bad_request(e):
 
 @app.errorhandler(500)
 def internal_error(error):
-    """Handle 500 errors"""
-    from flask import Response
-    return Response('{"status":"ok","message":"Server running"}', status=200, mimetype='application/json')
+    return jsonify({
+        "error": "Internal server error"
+    }), 500
+
 
 # ============================================================================
 # ENTRY POINT
