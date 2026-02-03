@@ -38,6 +38,16 @@ class ScamType(Enum):
     LOTTERY_SCAM = "lottery_scam"
     ROMANCE_SCAM = "romance_scam"
     INVESTMENT_FRAUD = "investment_fraud"
+    TECH_SUPPORT = "tech_support"
+    FAKE_JOB_OFFER = "fake_job_offer"
+    PACKAGE_DELIVERY = "package_delivery"
+    TAX_GOVERNMENT = "tax_government"
+    CRYPTOCURRENCY = "cryptocurrency"
+    SOCIAL_ENGINEERING = "social_engineering"
+    PRIZE_REWARD = "prize_reward"
+    IMPERSONATION = "impersonation"
+    BLACKMAIL_EXTORTION = "blackmail_extortion"
+    INHERITANCE_MONEY = "inheritance_money"
     UNKNOWN = "unknown"
 
 @dataclass
@@ -62,12 +72,55 @@ class ScamDetectionResult:
 class ScamDetectionEngine:
     def __init__(self):
         self.phishing_patterns = [
+            # Phishing & Banking
             (r"verify.*upi|upi.*verify|confirm.*upi", "UPI Verification", 0.95),
             (r"verify.*account|confirm.*account|update.*account", "Account Compromise", 0.85),
             (r"urgent.*atm|atm.*card.*block", "Card Block", 0.90),
+            
+            # Lottery & Reward
             (r"won.*lottery|congratulations.*won", "Lottery Scam", 0.88),
+            (r"won.*prize|claim.*gift|free.*voucher|free.*reward", "Prize/Reward Scam", 0.82),
+            
+            # Investment & Financial
             (r"double.*money|quick.*profit|guaranteed.*return", "Investment Fraud", 0.85),
+            
+            # Romance
             (r"meet.*soon|love.*you|feeling.*close", "Romance Scam", 0.80),
+            
+            # Tech Support
+            (r"virus|malware|computer.*infected|click.*fix|detect.*malware", "Tech Support", 0.83),
+            (r"microsoft|windows.*update|system.*detected", "Tech Support", 0.80),
+            
+            # Job Scams
+            (r"processing fee|job.*application|hiring.*bonus|high.*paying.*job", "Fake Job Offer", 0.82),
+            (r"congratulations.*selected|job.*offer.*confirm", "Fake Job Offer", 0.80),
+            
+            # Package Delivery
+            (r"delivery.*failed|update.*payment|reschedule.*delivery|package.*claim", "Package Delivery", 0.85),
+            (r"failed.*delivery|shipping.*info|confirm.*address", "Package Delivery", 0.82),
+            
+            # Tax & Government
+            (r"irs|tax.*return|legal.*action|avoid.*fine", "Tax/Government", 0.87),
+            (r"government.*agency|official.*notice|audit", "Tax/Government", 0.84),
+            
+            # Cryptocurrency
+            (r"bitcoin|ethereum|crypto|blockchain|nft.*million|wallet.*address", "Cryptocurrency", 0.84),
+            (r"invest.*crypto|get.*free.*nft|limited.*time.*offer", "Cryptocurrency", 0.82),
+            
+            # Social Engineering
+            (r"confirm.*password|verify.*password|security.*verification", "Social Engineering", 0.86),
+            (r"calling.*from.*bank|represent.*company", "Social Engineering", 0.80),
+            
+            # Impersonation
+            (r"calling.*on.*behalf|represent|authorized.*agent", "Impersonation", 0.83),
+            
+            # Blackmail & Extortion
+            (r"compromising.*picture|send.*money|i.*have.*photo|post.*everywhere", "Blackmail/Extortion", 0.90),
+            (r"unless.*pay|ransom.*demand", "Blackmail/Extortion", 0.88),
+            
+            # Inheritance & Money Transfer
+            (r"inherited.*million|relative.*passed|legacy.*fund", "Inheritance/Money", 0.86),
+            (r"bank.*detail|transfer.*money|claim.*inheritance", "Inheritance/Money", 0.82),
         ]
     
     def detect(self, message: str) -> ScamDetectionResult:
@@ -81,17 +134,41 @@ class ScamDetectionEngine:
             if re.search(pattern, message_lower):
                 if confidence > max_confidence:
                     max_confidence = confidence
+                    matched_pattern = scam_name
+                    
+                    # Map scam names to ScamType enum
                     if scam_name == "UPI Verification":
                         detected_type = ScamType.PHISHING_UPI
                     elif scam_name == "Account Compromise":
                         detected_type = ScamType.PHISHING_BANKING
+                    elif scam_name == "Card Block":
+                        detected_type = ScamType.PHISHING_BANKING
                     elif scam_name == "Lottery Scam":
                         detected_type = ScamType.LOTTERY_SCAM
+                    elif scam_name == "Prize/Reward Scam":
+                        detected_type = ScamType.PRIZE_REWARD
                     elif scam_name == "Investment Fraud":
                         detected_type = ScamType.INVESTMENT_FRAUD
                     elif scam_name == "Romance Scam":
                         detected_type = ScamType.ROMANCE_SCAM
-                    matched_pattern = scam_name
+                    elif scam_name == "Tech Support":
+                        detected_type = ScamType.TECH_SUPPORT
+                    elif scam_name == "Fake Job Offer":
+                        detected_type = ScamType.FAKE_JOB_OFFER
+                    elif scam_name == "Package Delivery":
+                        detected_type = ScamType.PACKAGE_DELIVERY
+                    elif scam_name == "Tax/Government":
+                        detected_type = ScamType.TAX_GOVERNMENT
+                    elif scam_name == "Cryptocurrency":
+                        detected_type = ScamType.CRYPTOCURRENCY
+                    elif scam_name == "Social Engineering":
+                        detected_type = ScamType.SOCIAL_ENGINEERING
+                    elif scam_name == "Impersonation":
+                        detected_type = ScamType.IMPERSONATION
+                    elif scam_name == "Blackmail/Extortion":
+                        detected_type = ScamType.BLACKMAIL_EXTORTION
+                    elif scam_name == "Inheritance/Money":
+                        detected_type = ScamType.INHERITANCE_MONEY
         
         is_scam = max_confidence > 0.5
         
