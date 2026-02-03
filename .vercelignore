@@ -1,0 +1,16 @@
+__pycache__
+*.pyc
+.git
+.env
+.env.local
+node_modules
+.next
+.vercel
+.DS_Store
+*.log
+src/
+configs/
+data/
+docs/
+tests/
+.gitignore

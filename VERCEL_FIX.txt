@@ -1,0 +1,140 @@
+================================================================================
+VERCEL DEPLOYMENT - ERROR FIX
+================================================================================
+
+ERROR RECEIVED:
+  "This Serverless Function has crashed"
+  500: INTERNAL_SERVER_ERROR
+  FUNCTION_INVOCATION_FAILED
+
+ROOT CAUSE:
+  Vercel configuration was incorrect. The vercel.json file wasn't properly 
+  configured to route all requests to the wsgi.py entry point.
+
+SOLUTION IMPLEMENTED:
+  ✅ Updated vercel.json with proper routing configuration
+  ✅ Created .vercelignore to exclude unnecessary files
+  ✅ wsgi.py configured as the main entry point
+
+================================================================================
+WHAT WAS FIXED
+================================================================================
+
+1. vercel.json Updated:
+   - Changed from "framework: flask" to explicit build configuration
+   - Added proper routes to direct all requests to wsgi.py
+   - Maintained environment variables
+
+2. .vercelignore Created:
+   - Excludes __pycache__, .git, node_modules
+   - Reduces deployment size
+
+3. Files Ready:
+   ✅ main.py - Your Flask application
+   ✅ wsgi.py - Entry point for Vercel
+   ✅ requirements.txt - Dependencies
+   ✅ vercel.json - Deployment configuration
+   ✅ .vercelignore - Ignore rules
+
+================================================================================
+WHAT TO DO NOW
+================================================================================
+
+OPTION 1: Redeploy to Vercel (Recommended)
+1. Go to https://vercel.com
+2. Click "Import Project"
+3. Connect your GitHub repository
+4. Wait for deployment to complete
+5. Check the deployment logs
+
+OPTION 2: Re-deploy Existing Project
+1. Go to https://vercel.com/dashboard
+2. Find your "ai-agentic-honeypot" project
+3. Click "Redeploy" button
+4. Wait for new deployment
+5. Check status
+
+OPTION 3: Manual Git Push
+1. If you have the repo on GitHub:
+   git add .
+   git commit -m "Fix Vercel configuration"
+   git push origin main
+2. Vercel will auto-deploy
+
+================================================================================
+EXPECTED BEHAVIOR AFTER FIX
+================================================================================
+
+When deployment completes:
+✅ Status shows: "Ready"
+✅ Endpoint URL displays without errors
+✅ Health check returns: {"status": "ok", ...}
+✅ API endpoints respond: 200, 401, 400 as expected
+✅ No more 500 errors
+
+================================================================================
+TEST AFTER REDEPLOYMENT
+================================================================================
+
+Once redeployed, test with:
+
+1. Health Check:
+   curl https://ai-agentic-honeypot.vercel.app/
+
+2. Detect Scam:
+   curl -X POST https://ai-agentic-honeypot.vercel.app/api/v1/detect-scam \
+     -H "X-API-Key: test_key_12345" \
+     -H "Content-Type: application/json" \
+     -d '{"message": "Verify your UPI"}'
+
+3. Create Conversation:
+   curl -X POST https://ai-agentic-honeypot.vercel.app/api/v1/conversation \
+     -H "X-API-Key: test_key_12345" \
+     -H "Content-Type: application/json" \
+     -d '{}'
+
+================================================================================
+FILES UPDATED
+================================================================================
+
+✅ vercel.json - Fixed routing configuration
+✅ .vercelignore - Created to optimize deployment
+✅ main.py - No changes (already correct)
+✅ wsgi.py - Already correct
+
+All files are ready for Vercel deployment!
+
+================================================================================
+YOUR ENDPOINT URL
+================================================================================
+
+After successful redeployment:
+https://ai-agentic-honeypot.vercel.app
+
+Use this URL in the hackathon submission form!
+
+API Key: test_key_12345
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+If you still see errors:
+
+1. Check deployment logs:
+   - Go to Vercel dashboard
+   - Click your project
+   - Click "Deployments" tab
+   - View build logs
+
+2. Common issues:
+   - Missing requirements.txt → Add all Python packages
+   - Missing main.py → Ensure it's in root directory
+   - Import errors → Check for circular imports
+
+3. If all else fails:
+   - Delete project from Vercel
+   - Create new project from GitHub
+   - Vercel will detect Python and auto-configure
+
+================================================================================

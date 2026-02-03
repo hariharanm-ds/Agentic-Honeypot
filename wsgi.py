@@ -1,10 +1,8 @@
 """
-WSGI Entry Point for Vercel Deployment
-This file exports the Flask application for serverless deployment
+WSGI Entry Point for Production Deployment
 """
 
-from src.api import app
+from main import app
 
-# Vercel expects the application to be called 'app'
 if __name__ == "__main__":
     app.run(debug=False)

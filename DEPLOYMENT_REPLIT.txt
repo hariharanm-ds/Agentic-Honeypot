@@ -1,0 +1,161 @@
+# DEPLOYMENT INSTRUCTIONS - REPLIT
+
+## CRITICAL FIX - Root Endpoint
+The updated main.py now includes a root `/` endpoint that returns 200 status code for deployment health checks. This fixes the "failing health checks" error on Replit/Railway.
+
+## Step 1: Setup Replit Account
+1. Go to https://replit.com
+2. Sign up with GitHub, Google, or email
+3. Click "Create" button
+4. Select "Python" from templates
+5. Name your Repl "agentic-honeypot"
+6. Click "Create Repl"
+
+## Step 2: Upload Files
+1. Go to the Files panel on the left
+2. Delete the default "main.py" if it exists
+3. Upload these files:
+   - main.py (from this project)
+   - requirements.txt (from this project)
+4. Create a .replit file with:
+   ```
+   run = "python main.py"
+   ```
+
+## Step 3: Install Dependencies
+Click the "Run" button at the top (or press Ctrl+Enter).
+Replit will automatically install Flask and Flask-CORS from requirements.txt.
+
+## Step 4: Run the Application
+- Click the "Run" button
+- Wait for message: "Running on http://0.0.0.0:5000"
+- Your public URL will appear in the right panel
+- Format: https://agentic-honeypot-{username}.repl.co
+
+## Step 5: Test the Endpoint
+Replace {username} with your Replit username and run these curl commands:
+
+### Test 1: Health Check
+```bash
+curl https://agentic-honeypot-{username}.repl.co/health
+```
+Expected Response:
+```json
+{
+  "status": "healthy",
+  "timestamp": "2026-02-03T...",
+  "active_conversations": 0,
+  "api_version": "1.0"
+}
+```
+
+### Test 2: Create Conversation
+```bash
+curl -X POST https://agentic-honeypot-{username}.repl.co/api/v1/conversation \
+  -H "X-API-Key: test_key_12345" \
+  -H "Content-Type: application/json" \
+  -d '{"persona_name": "victim_001"}'
+```
+Expected Response:
+```json
+{
+  "conversation_id": "...",
+  "persona_name": "victim_001",
+  "timestamp": "2026-02-03T..."
+}
+```
+
+### Test 3: Detect Scam (with auth)
+```bash
+curl -X POST https://agentic-honeypot-{username}.repl.co/api/v1/detect-scam \
+  -H "X-API-Key: test_key_12345" \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Please verify your UPI account immediately"}'
+```
+Expected Response:
+```json
+{
+  "timestamp": "2026-02-03T...",
+  "detection": {
+    "is_scam": true,
+    "scam_type": "phishing_upi",
+    "confidence": 0.95,
+    "detection_method": "pattern_matching",
+    "extracted_keywords": [...],
+    "explanation": "..."
+  }
+}
+```
+
+### Test 4: Unauthorized (missing API key)
+```bash
+curl -X POST https://agentic-honeypot-{username}.repl.co/api/v1/detect-scam \
+  -H "Content-Type: application/json" \
+  -d '{"message": "test"}'
+```
+Expected Response: 401 Unauthorized
+```json
+{
+  "error": "Unauthorized",
+  "message": "Invalid or missing API key"
+}
+```
+
+### Test 5: Bad Request (missing message field)
+```bash
+curl -X POST https://agentic-honeypot-{username}.repl.co/api/v1/detect-scam \
+  -H "X-API-Key: test_key_12345" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+Expected Response: 400 Bad Request
+```json
+{
+  "error": "Missing required field: message"
+}
+```
+
+## Step 6: Submit to Hackathon
+
+Use this endpoint URL for your submission:
+```
+https://agentic-honeypot-{username}.repl.co
+```
+
+API Key:
+```
+test_key_12345
+```
+
+Required Headers:
+```
+X-API-Key: test_key_12345
+Content-Type: application/json
+```
+
+## API Endpoints
+
+| Endpoint | Method | Auth | Purpose |
+|----------|--------|------|---------|
+| `/health` | GET | No | Check if API is running |
+| `/api/v1/detect-scam` | POST | Yes | Detect if message is a scam |
+| `/api/v1/conversation` | POST | Yes | Create new conversation |
+| `/api/v1/conversation/{id}/message` | POST | Yes | Send message and get response |
+| `/api/v1/conversation/{id}` | GET | Yes | Get conversation state |
+
+## Troubleshooting
+
+If you see "Module not found" error:
+1. Make sure requirements.txt is uploaded
+2. Click "Run" again to reinstall dependencies
+3. Check that main.py is in the root directory
+
+If the URL doesn't load:
+1. Wait 30 seconds for Replit to start the server
+2. Click "Run" again
+3. Check the URL in the right panel matches your username
+
+If tests fail with 502 Bad Gateway:
+1. The server may still be starting
+2. Wait 10 seconds and try again
+3. Check the Replit console for errors
