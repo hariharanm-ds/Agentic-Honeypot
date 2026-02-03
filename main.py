@@ -438,10 +438,11 @@ def handle_preflight():
     # Handle CORS preflight
     if request.method == 'OPTIONS':
         return jsonify({"status": "ok"}), 200
-
-    # HARD BYPASS JSON parsing for root
+    
+    # HARD BYPASS JSON parsing for root - intercept before Flask parses
     if request.path == '/':
-        request._cached_json = {}
+        # Skip JSON parsing entirely for root endpoint
+        request._cached_json = (True, {})
         return None
 
 
@@ -457,12 +458,14 @@ def require_api_key(f):
         return f(*args, **kwargs)
     return decorated_function
 
-@app.route('/', methods=['GET'])
+@app.route('/', methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH'])
 def root():
+    """Root health check - accepts any method and any body format"""
     return jsonify({
         "status": "ok",
         "service": "agentic-honeypot",
-        "note": "Use /api/v1/* endpoints"
+        "version": "1.0",
+        "message": "API is running. Use /api/v1/* endpoints"
     }), 200
 
 
@@ -482,6 +485,14 @@ def health_check():
 def detect_scam():
     """Detect if message is a scam"""
     try:
+        # Validate Content-Type
+        if request.content_type and 'application/json' not in request.content_type:
+            return jsonify({
+                "error": "Invalid Content-Type",
+                "message": "Content-Type must be application/json",
+                "received": request.content_type
+            }), 400
+        
         data = request.get_json(silent=True)
 
         
@@ -505,6 +516,14 @@ def detect_scam():
 def create_conversation():
     """Create new conversation"""
     try:
+        # Validate Content-Type
+        if request.content_type and 'application/json' not in request.content_type:
+            return jsonify({
+                "error": "Invalid Content-Type",
+                "message": "Content-Type must be application/json",
+                "received": request.content_type
+            }), 400
+        
         data = request.get_json(silent=True) or {}
         persona_name = data.get('persona_name', 'victim_001')
         
@@ -526,6 +545,14 @@ def create_conversation():
 def process_message(conversation_id):
     """Process scammer message and get agent response"""
     try:
+        # Validate Content-Type
+        if request.content_type and 'application/json' not in request.content_type:
+            return jsonify({
+                "error": "Invalid Content-Type",
+                "message": "Content-Type must be application/json",
+                "received": request.content_type
+            }), 400
+        
         data = request.get_json(silent=True)
 
         
@@ -621,10 +648,12 @@ def method_not_allowed(error):
 
 @app.errorhandler(BadRequest)
 def handle_bad_request(e):
+    """Handle malformed JSON or invalid requests"""
     return jsonify({
-        "status": "error",
-        "message": "Invalid JSON body",
-        "hint": "Ensure Content-Type is application/json and body is valid"
+        "error": "Bad Request",
+        "message": "Invalid or malformed JSON body",
+        "details": str(e.description),
+        "hint": "Ensure Content-Type header is 'application/json' and body is valid JSON"
     }), 400
 
 @app.errorhandler(500)
