@@ -32,7 +32,23 @@ class RootOnlyMiddleware:
             start_response(status, headers)
             return [response_body]
         
-        # For all other requests (POST /, /api/*, etc.), pass to Flask
+        # If POST/PUT/DELETE on /, reject at WSGI level
+        if path in ['/', ''] and method in ['POST', 'PUT', 'DELETE', 'PATCH']:
+            status = '405 Method Not Allowed'
+            response_body = json.dumps({
+                "error": "Method Not Allowed",
+                "message": "Only GET allowed on root endpoint"
+            }).encode('utf-8')
+            
+            headers = [
+                ('Content-Type', 'application/json; charset=utf-8'),
+                ('Content-Length', str(len(response_body))),
+                ('Access-Control-Allow-Origin', '*')
+            ]
+            start_response(status, headers)
+            return [response_body]
+        
+        # For all other requests (/api/*, etc.), pass to Flask
         return self.app(environ, start_response)
 
 # Apply middleware at outermost level
