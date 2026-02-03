@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic AI Honeypot - Advanced Scam Detection</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --success: #4caf50;
+            --danger: #f44336;
+            --warning: #ff9800;
+            --info: #2196F3;
+            --dark: #1a1a2e;
+            --light: #f5f7fa;
+            --border-radius: 15px;
+            --shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            --shadow-lg: 0 25px 80px rgba(0, 0, 0, 0.25);
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--dark) 0%, #16213e 50%, var(--secondary) 100%);
+            color: #333;
+            overflow: hidden;
+        }
+
+        .main-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            box-shadow: 5px 0 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-section {
+            padding: 25px 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            text-align: center;
+            border-bottom: 3px solid var(--accent);
+        }
+
+        .logo-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .logo-text {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .logo-subtext {
+            font-size: 0.8em;
+            opacity: 0.9;
+        }
+
+        .sidebar-section {
+            padding: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .sidebar-label {
+            font-size: 0.8em;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-input, .sidebar-select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .sidebar-input:focus, .sidebar-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .sidebar-button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .sidebar-button:active {
+            transform: translateY(0);
+        }
+
+        .sidebar-button.danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #c62828 100%);
+        }
+
+        /* MAIN CONTENT */
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .topbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 30px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .topbar-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success);
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-badge.offline {
+            background: rgba(244, 67, 54, 0.1);
+            color: var(--danger);
+        }
+
+        .status-badge.offline .status-dot {
+            background: var(--danger);
+            animation: none;
+        }
+
+        .workspace {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            overflow: auto;
+            background: linear-gradient(135deg, rgba(26, 26, 46, 0.5) 0%, rgba(22, 33, 62, 0.5) 100%);
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .panel:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .panel-header {
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-bottom: 3px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.2em;
+            font-weight: 700;
+        }
+
+        .panel-icon {
+            font-size: 1.3em;
+        }
+
+        .panel-content {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message-box {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 2px dashed rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            background: #fafafa;
+        }
+
+        .message-item {
+            margin: 12px 0;
+            padding: 12px;
+            border-radius: 10px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .message-scammer {
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.1) 0%, rgba(244, 67, 54, 0.05) 100%);
+            border-left: 4px solid var(--danger);
+        }
+
+        .message-victim {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(76, 175, 80, 0.05) 100%);
+            border-left: 4px solid var(--success);
+        }
+
+        .message-sender {
+            font-weight: 700;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .message-text {
+            font-size: 0.95em;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        .tab-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab-button {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            color: #999;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            font-size: 0.95em;
+        }
+
+        .tab-button:hover {
+            color: var(--primary);
+        }
+
+        .tab-button.active {
+            color: var(--secondary);
+            border-bottom-color: var(--secondary);
+        }
+
+        .tab-content {
+            display: none;
+            flex: 1;
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detection-card {
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(33, 150, 243, 0.05) 100%);
+            border: 2px solid rgba(33, 150, 243, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid var(--info);
+        }
+
+        .detection-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 0.95em;
+        }
+
+        .detection-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .detection-value {
+            color: var(--secondary);
+            font-weight: 700;
+        }
+
+        .entity-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .entity-tag {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 25px;
+            font-size: 0.85em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            animation: tagPop 0.3s ease;
+        }
+
+        @keyframes tagPop {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+        }
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            flex: 1;
+            text-align: center;
+        }
+
+        .empty-state-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
+        .input-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+            font-size: 0.95em;
+            transition: all 0.3s;
+        }
+
+        .input-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .button-group button {
+            flex: 1;
+        }
+
+        .action-button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-button.primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .action-button.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .action-button.danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #c62828 100%);
+            color: white;
+        }
+
+        .action-button.danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(244, 67, 54, 0.3);
+        }
+
+        .action-button.secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .action-button.secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .loader {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1200px) {
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="logo-section">
+                <div class="logo-icon">🔐</div>
+                <div class="logo-text">Honeypot AI</div>
+                <div class="logo-subtext">Scam Detection Engine</div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-label">👤 Victim Persona</div>
+                <select id="persona" class="sidebar-select">
+                    <option value="rajesh_kumar">Rajesh Kumar (58)</option>
+                    <option value="priya_sharma">Priya Sharma (32)</option>
+                    <option value="arjun_nair">Arjun Nair (45)</option>
+                </select>
+            </div>
+
+            <div class="sidebar-section">
+                <button onclick="createConversation()" class="sidebar-button">
+                    <i class="fas fa-plus"></i> Create Conversation
+                </button>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-label">💬 Send Message</div>
+                <textarea id="message" class="sidebar-input" placeholder="Type scammer message..."></textarea>
+                <button onclick="sendMessage()" class="sidebar-button">
+                    <i class="fas fa-paper-plane"></i> Send
+                </button>
+            </div>
+
+            <div class="sidebar-section" style="margin-top: auto;">
+                <button onclick="exportConversation()" class="sidebar-button" style="background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);">
+                    <i class="fas fa-download"></i> Export JSON
+                </button>
+                <button onclick="deleteConversation()" class="sidebar-button danger">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="content">
+            <div class="topbar">
+                <div class="topbar-title">
+                    <i class="fas fa-brain"></i> Agentic AI Honeypot System
+                </div>
+                <div id="statusBadge" class="status-badge">
+                    <div class="status-dot"></div>
+                    API Connected
+                </div>
+            </div>
+
+            <div class="workspace">
+                <!-- LEFT PANEL: CONVERSATION -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-icon">💬</span>
+                        <span>Live Conversation</span>
+                    </div>
+                    <div class="panel-content">
+                        <div id="messagesContainer" class="message-box">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📭</div>
+                                <div>Create a conversation to get started</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT PANEL: ANALYSIS -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-icon">📊</span>
+                        <span>Intelligence Analysis</span>
+                    </div>
+                    <div class="panel-content">
+                        <div class="tab-group">
+                            <button class="tab-button active" onclick="switchTab('detection')">
+                                🎯 Detection
+                            </button>
+                            <button class="tab-button" onclick="switchTab('entities')">
+                                🏷️ Entities
+                            </button>
+                            <button class="tab-button" onclick="switchTab('metrics')">
+                                📈 Metrics
+                            </button>
+                        </div>
+
+                        <!-- DETECTION TAB -->
+                        <div id="detection" class="tab-content active">
+                            <div id="detectionResult">
+                                <div class="empty-state" style="flex: 1;">
+                                    <div class="empty-state-icon">🔍</div>
+                                    <div>Send a message to analyze scam detection</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ENTITIES TAB -->
+                        <div id="entities" class="tab-content">
+                            <div id="entitiesResult">
+                                <div class="empty-state" style="flex: 1;">
+                                    <div class="empty-state-icon">🔑</div>
+                                    <div>No entities extracted yet</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- METRICS TAB -->
+                        <div id="metrics" class="tab-content">
+                            <div class="metrics-grid">
+                                <div class="metric-card">
+                                    <div class="metric-value" id="messageCount">0</div>
+                                    <div class="metric-label">Messages</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-value" id="entityCount">0</div>
+                                    <div class="metric-label">Entities</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-value" id="avgConfidence">—</div>
+                                    <div class="metric-label">Avg Confidence</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-value" id="phase">0</div>
+                                    <div class="metric-label">Phase</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000';
+        const API_KEY = 'test_key_12345';
+        let currentConversationId = null;
+        let messageCount = 0;
+        let entityCount = 0;
+
+        // Check API health on load
+        window.addEventListener('load', () => {
+            checkAPIHealth();
+        });
+
+        function checkAPIHealth() {
+            fetch(`${API_BASE}/health`)
+                .then(r => r.json())
+                .then(data => {
+                    updateStatusBadge(true);
+                })
+                .catch(e => {
+                    updateStatusBadge(false);
+                });
+        }
+
+        function updateStatusBadge(isOnline) {
+            const badge = document.getElementById('statusBadge');
+            if (isOnline) {
+                badge.classList.remove('offline');
+                badge.innerHTML = '<div class="status-dot"></div> API Connected';
+            } else {
+                badge.classList.add('offline');
+                badge.innerHTML = '<div class="status-dot"></div> API Offline';
+            }
+        }
+
+        function createConversation() {
+            const persona = document.getElementById('persona').value;
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loader"></span> Creating...';
+            
+            fetch(`${API_BASE}/api/v1/conversation`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-Key': API_KEY
+                },
+                body: JSON.stringify({ persona_id: persona })
+            })
+            .then(r => {
+                if (r.status === 401) {
+                    alert('❌ Authentication failed! API key is missing or incorrect.');
+                    return null;
+                }
+                return r.json();
+            })
+            .then(data => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-plus"></i> Create Conversation';
+                
+                if (data && data.conversation_id) {
+                    currentConversationId = data.conversation_id;
+                    messageCount = 0;
+                    entityCount = 0;
+                    clearMessages();
+                    updateMetrics();
+                    alert('✅ Conversation created successfully!');
+                } else {
+                    alert('❌ Failed to create conversation');
+                }
+            })
+            .catch(e => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-plus"></i> Create Conversation';
+                alert('❌ Error: ' + e.message);
+                checkAPIHealth();
+            });
+        }
+
+        function sendMessage() {
+            if (!currentConversationId) {
+                alert('⚠️ Create a conversation first!');
+                return;
+            }
+
+            const message = document.getElementById('message').value.trim();
+            if (!message) return;
+
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loader"></span> Sending...';
+
+            fetch(`${API_BASE}/api/v1/conversation/${currentConversationId}/message`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-Key': API_KEY
+                },
+                body: JSON.stringify({ message: message })
+            })
+            .then(r => r.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
+
+                messageCount++;
+                addMessage('scammer', message);
+                addMessage('victim', data.response || 'No response generated');
+                
+                if (data.scam_detection) {
+                    updateDetection(data.scam_detection);
+                }
+                if (data.extracted_entities) {
+                    entityCount = data.extracted_entities.length || 0;
+                    updateEntities(data.extracted_entities);
+                }
+                
+                updateMetrics();
+                document.getElementById('message').value = '';
+            })
+            .catch(e => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
+                alert('❌ Error: ' + e.message);
+            });
+        }
+
+        function addMessage(role, text) {
+            const container = document.getElementById('messagesContainer');
+            
+            if (container.querySelector('.empty-state')) {
+                container.innerHTML = '';
+            }
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message-item message-${role}`;
+            
+            const senderName = role === 'scammer' ? '🚨 Scammer' : '👤 Victim';
+            messageDiv.innerHTML = `
+                <div class="message-sender">${senderName}</div>
+                <div class="message-text">${text}</div>
+            `;
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function updateDetection(result) {
+            let html = `
+                <div class="detection-card">
+                    <div class="detection-row">
+                        <span class="detection-label">🎯 Scam Type:</span>
+                        <span class="detection-value">${result.scam_type || 'unknown'}</span>
+                    </div>
+                    <div class="detection-row">
+                        <span class="detection-label">📊 Confidence:</span>
+                        <span class="detection-value">${(result.confidence * 100).toFixed(1)}%</span>
+                    </div>
+                    <div class="detection-row">
+                        <span class="detection-label">🔑 Keywords:</span>
+                        <span class="detection-value">${(result.keywords || []).join(', ') || 'None'}</span>
+                    </div>
+                </div>
+            `;
+            document.getElementById('detectionResult').innerHTML = html;
+        }
+
+        function updateEntities(entities) {
+            let html = '';
+            if (Array.isArray(entities) && entities.length > 0) {
+                entities.forEach(e => {
+                    html += `<span class="entity-tag">
+                        <i class="fas fa-key"></i> ${e.type}: <strong>${e.value}</strong> (${(e.confidence * 100).toFixed(0)}%)
+                    </span>`;
+                });
+            } else {
+                html = '<div class="empty-state" style="flex: 1;"><div class="empty-state-icon">🔑</div><div>No entities extracted</div></div>';
+            }
+            document.getElementById('entitiesResult').innerHTML = html || html;
+        }
+
+        function updateMetrics() {
+            document.getElementById('messageCount').textContent = messageCount;
+            document.getElementById('entityCount').textContent = entityCount;
+        }
+
+        function clearMessages() {
+            document.getElementById('messagesContainer').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📭</div>
+                    <div>Conversation started. Send messages to analyze.</div>
+                </div>
+            `;
+            document.getElementById('detectionResult').innerHTML = `
+                <div class="empty-state" style="flex: 1;">
+                    <div class="empty-state-icon">🔍</div>
+                    <div>Send a message to see detection analysis</div>
+                </div>
+            `;
+            document.getElementById('entitiesResult').innerHTML = `
+                <div class="empty-state" style="flex: 1;">
+                    <div class="empty-state-icon">🔑</div>
+                    <div>No entities extracted yet</div>
+                </div>
+            `;
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function exportConversation() {
+            if (!currentConversationId) {
+                alert('⚠️ No conversation to export!');
+                return;
+            }
+
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loader"></span> Exporting...';
+
+            fetch(`${API_BASE}/api/v1/conversation/${currentConversationId}/export`, {
+                headers: { 'X-API-Key': API_KEY }
+            })
+            .then(r => r.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-download"></i> Export JSON';
+
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `conversation_${currentConversationId}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            })
+            .catch(e => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-download"></i> Export JSON';
+                alert('❌ Error: ' + e.message);
+            });
+        }
+
+        function deleteConversation() {
+            if (!currentConversationId) {
+                alert('⚠️ No conversation to delete!');
+                return;
+            }
+
+            if (!confirm('Are you sure? This action cannot be undone.')) return;
+
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loader"></span> Deleting...';
+
+            fetch(`${API_BASE}/api/v1/conversation/${currentConversationId}`, {
+                method: 'DELETE',
+                headers: { 'X-API-Key': API_KEY }
+            })
+            .then(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-trash"></i> Delete';
+                
+                currentConversationId = null;
+                messageCount = 0;
+                entityCount = 0;
+                clearMessages();
+                updateMetrics();
+                alert('✅ Conversation deleted successfully');
+            })
+            .catch(e => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-trash"></i> Delete';
+                alert('❌ Error: ' + e.message);
+            });
+        }
+
+        // Auto-check API health every 30 seconds
+        setInterval(checkAPIHealth, 30000);
+    </script>
+</body>
+</html>
