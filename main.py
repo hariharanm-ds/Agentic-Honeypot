@@ -15,6 +15,7 @@ from enum import Enum
 from dataclasses import dataclass, field, asdict
 from typing import List, Dict, Optional, Tuple
 from collections import defaultdict
+from werkzeug.exceptions import BadRequest
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -434,25 +435,17 @@ memory_manager = MemoryManager()
 
 @app.before_request
 def handle_preflight():
-    """Handle preflight requests and any body parsing issues"""
-    from flask import Response
-    
-    # Handle OPTIONS requests
     if request.method == 'OPTIONS':
-        response = Response('{"status":"ok"}', status=200, mimetype='application/json')
+        response = jsonify({"status": "ok"})
         response.headers.add('Access-Control-Allow-Origin', '*')
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,X-API-Key')
-        response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,HEAD,OPTIONS')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type, X-API-Key')
+        response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
         return response
-    
-    # For root path, bypass all body validation
-    if request.path == '/' and request.method in ['POST', 'PUT', 'PATCH']:
-        try:
-            # Don't validate body - just consume it
-            request.get_data()
-        except Exception:
-            # If body is invalid, we still continue
-            pass
+
+    # NEVER try to parse JSON for root endpoint
+    if request.path == '/':
+        return None
+
 
 
 def require_api_key(f):
@@ -468,11 +461,13 @@ def require_api_key(f):
 
 @app.route('/', methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'])
 def root():
-    """Root endpoint for deployment health checks - simplest possible response"""
-    from flask import Response
-    # Return plain text response to avoid any JSON parsing issues
-    response_text = '{"status":"ok","service":"agentic-honeypot","version":"1.0"}'
-    return Response(response_text, status=200, mimetype='application/json')
+    return jsonify({
+        "status": "ok",
+        "service": "agentic-honeypot",
+        "version": "1.0",
+        "note": "Use /api/v1/* endpoints for API operations"
+    }), 200
+
 
 @app.route('/health', methods=['GET'])
 def health_check():
@@ -624,11 +619,13 @@ def method_not_allowed(error):
     """Handle 405 errors"""
     return jsonify({"error": "Method not allowed"}), 405
 
-@app.errorhandler(400)
-def bad_request(error):
-    """Handle 400 errors"""
-    from flask import Response
-    return Response('{"status":"ok","message":"Bad request handled"}', status=200, mimetype='application/json')
+@app.errorhandler(BadRequest)
+def handle_bad_request(e):
+    return jsonify({
+        "status": "error",
+        "message": "Invalid JSON body",
+        "hint": "Ensure Content-Type is application/json and body is valid"
+    }), 400
 
 @app.errorhandler(500)
 def internal_error(error):
