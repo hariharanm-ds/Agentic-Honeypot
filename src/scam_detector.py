@@ -196,8 +196,8 @@ class ScamDetectionEngine:
         # Determine scam type
         scam_type = self._classify_scam_type(message_lower, matched_patterns)
         
-        # Is it a scam? - Lower threshold
-        is_scam = combined_score > 0.35
+        # Is it a scam? - Threshold at 0.30 to catch clear phishing attempts
+        is_scam = combined_score > 0.30
         
         # Build explanation
         explanation = self._build_explanation(matched_patterns, matched_keywords, combined_score)

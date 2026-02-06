@@ -107,8 +107,9 @@ class ScamDetectionEngine:
         self.phishing_patterns = [
             # Phishing & Banking
             (r"verify.*upi|upi.*verify|confirm.*upi", "UPI Verification", 0.95),
-            (r"verify.*account|confirm.*account|update.*account", "Account Compromise", 0.85),
-            (r"urgent.*atm|atm.*card.*block", "Card Block", 0.90),
+            (r"verify.*account|confirm.*account|update.*account|verify.*immediately", "Account Compromise", 0.85),
+            (r"account.*block|account.*suspended|account.*will.*block|block.*account", "Account Blocked", 0.90),
+            (r"urgent.*atm|atm.*card.*block|card.*block.*urgent", "Card Block", 0.90),
             
             # Lottery & Reward
             (r"won.*lottery|congratulations.*won", "Lottery Scam", 0.88),
@@ -173,6 +174,8 @@ class ScamDetectionEngine:
                     if scam_name == "UPI Verification":
                         detected_type = ScamType.PHISHING_UPI
                     elif scam_name == "Account Compromise":
+                        detected_type = ScamType.PHISHING_BANKING
+                    elif scam_name == "Account Blocked":
                         detected_type = ScamType.PHISHING_BANKING
                     elif scam_name == "Card Block":
                         detected_type = ScamType.PHISHING_BANKING
@@ -487,6 +490,95 @@ def require_api_key(f):
 
 # ============================================================================
 # API ENDPOINTS
+# ============================================================================
+# SCAM DETECTION ENDPOINT - Matches Tester Format
+# ============================================================================
+
+@app.route('/api/v1/scam-detection', methods=['POST'])
+@require_api_key
+def scam_detection():
+    """
+    Scam detection endpoint - matches tester request format
+    
+    Expected request:
+    {
+        "sessionId": "string",
+        "message": {
+            "sender": "string",
+            "text": "string",
+            "timestamp": number
+        },
+        "conversationHistory": [],
+        "metadata": {
+            "channel": "string",
+            "language": "string",
+            "locale": "string"
+        }
+    }
+    """
+    try:
+        data = request.get_json(force=False, silent=True)
+        
+        if not data:
+            return jsonify({
+                "status": "error",
+                "reply": "No request data provided"
+            }), 400
+        
+        # Extract message text
+        message_obj = data.get('message', {})
+        if isinstance(message_obj, dict):
+            message_text = message_obj.get('text', '')
+        else:
+            message_text = str(message_obj)
+        
+        if not message_text:
+            return jsonify({
+                "status": "error", 
+                "reply": "No message text provided"
+            }), 400
+        
+        # Detect scam
+        detection_result = scam_detector.detect(message_text)
+        
+        # Generate appropriate reply
+        if detection_result.is_scam:
+            # For scams, generate a response that appears to be from the victim
+            reply = generate_victim_response(message_text, detection_result.scam_type)
+        else:
+            reply = "I need more information to help you."
+        
+        return jsonify({
+            "status": "success",
+            "reply": reply
+        }), 200
+    
+    except Exception as e:
+        logger.error(f"Error in scam_detection: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "reply": f"Internal server error"
+        }), 500
+
+def generate_victim_response(message: str, scam_type) -> str:
+    """Generate a victim response to the scammer's message"""
+    # Map scam types to realistic victim responses
+    responses = {
+        "phishing_upi": "Why is my account being suspended?",
+        "phishing_banking": "Why is my account being suspended?",
+        "phishing_credentials": "What do you mean verify my account?",
+        "lottery_scam": "I never entered any lottery.",
+        "romance_scam": "When can I meet you?",
+        "investment_fraud": "Can you explain this investment opportunity more clearly?",
+        "tax_fraud": "I don't owe any taxes.",
+        "tech_support_scam": "How did you get my number?",
+        "unknown": "I'm confused. Can you explain?"
+    }
+    
+    # Get the scam type value
+    scam_name = scam_type.value if hasattr(scam_type, 'value') else str(scam_type)
+    return responses.get(scam_name, "Why is my account being suspended?")
+
 # ============================================================================
 
 @app.route('/', methods=['GET', 'POST', 'HEAD'])
