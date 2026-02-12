@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agentic Honeypot | API Docs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #0f172a;
+      --paper: #f6f6ef;
+      --paper-2: #ffffff;
+      --line: #d7d8cb;
+      --aqua: #0ea5a3;
+      --sun: #ff7a18;
+      --cobalt: #1d4ed8;
+      --muted: #596071;
+      --muted-2: #6b7488;
+      --radius: 18px;
+      --shadow: 0 20px 40px rgba(15, 23, 42, 0.1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Space Grotesk", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at 15% 15%, #fff3dc 0%, transparent 42%),
+                  radial-gradient(circle at 85% 5%, #dff8ff 0%, transparent 35%),
+                  var(--paper);
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+
+    .wrap {
+      width: min(980px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    nav {
+      margin: 20px auto;
+      padding: 14px 18px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid #fff;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .logo {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .logo span { color: var(--sun); }
+
+    .links {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .links a {
+      text-decoration: none;
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    header {
+      padding: 8px 0 20px;
+    }
+
+    h1 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: clamp(2rem, 4vw, 3.1rem);
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+    }
+
+    .muted { color: var(--muted-2); }
+
+    section {
+      margin: 14px 0 20px;
+      background: var(--paper-2);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      animation: riseIn 0.5s ease both;
+    }
+
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+    }
+
+    .endpoint {
+      border: 1px solid #d9e1ff;
+      border-left: 4px solid var(--cobalt);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      background: #fff;
+    }
+
+    .method {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      background: #dce7ff;
+      color: #0f2f7a;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background: #eef3ff;
+      border: 1px solid #d7e3ff;
+      border-radius: 6px;
+      padding: 1px 6px;
+    }
+
+    pre {
+      background: #0f172a;
+      color: #dbe6ff;
+      border-radius: 10px;
+      padding: 12px;
+      overflow-x: auto;
+      margin-top: 8px;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <nav>
+      <a class="logo" href="index.html">Agentic<span>Honeypot</span></a>
+      <div class="links">
+        <a href="index.html">Home</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </nav>
+
+    <header>
+      <h1>API Documentation</h1>
+      <p class="muted">Use the key <code>X-API-Key: test_key_12345</code> for protected endpoints.</p>
+    </header>
+
+    <section>
+      <h2>Endpoints</h2>
+      <div class="endpoint">
+        <div class="method">GET</div>
+        <p><code>/health</code> - Health status and active conversation count.</p>
+      </div>
+      <div class="endpoint">
+        <div class="method">POST</div>
+        <p><code>/api/v1/detect-scam</code> - Detect scam risk from input message.</p>
+      </div>
+      <div class="endpoint">
+        <div class="method">POST</div>
+        <p><code>/api/v1/conversation</code> - Start a conversation.</p>
+      </div>
+      <div class="endpoint">
+        <div class="method">POST</div>
+        <p><code>/api/v1/conversation/{id}/message</code> - Send message to conversation agent.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Quick Requests</h2>
+      <p class="muted">Detect scam example:</p>
+      <pre>{
+  "message": "Verify your UPI account immediately"
+}</pre>
+      <p class="muted" style="margin-top: 10px;">Create conversation example:</p>
+      <pre>{
+  "persona_name": "victim_001"
+}</pre>
+    </section>
+  </div>
+</body>
+</html>

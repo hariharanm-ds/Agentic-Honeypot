@@ -17,8 +17,10 @@
       --sun: #ff7a18;
       --cobalt: #1d4ed8;
       --muted: #596071;
+      --muted-2: #6b7488;
       --radius: 20px;
       --shadow: 0 22px 50px rgba(15, 23, 42, 0.11);
+      --shadow-soft: 0 10px 28px rgba(15, 23, 42, 0.08);
     }
 
     * {
@@ -39,6 +41,7 @@
                   var(--paper);
       min-height: 100vh;
       overflow-x: hidden;
+      line-height: 1.55;
     }
 
     body::before {
@@ -49,20 +52,59 @@
       background-image: linear-gradient(transparent 96%, rgba(15, 23, 42, 0.03) 100%);
       background-size: 100% 6px;
       opacity: 0.35;
+      z-index: -2;
+    }
+
+    .ambient {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
       z-index: -1;
+      overflow: hidden;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(2px);
+      opacity: 0.45;
+      animation: float 11s ease-in-out infinite;
+    }
+
+    .orb.a {
+      width: 190px;
+      height: 190px;
+      left: 4%;
+      top: 12%;
+      background: radial-gradient(circle, rgba(255, 122, 24, 0.32), rgba(255, 122, 24, 0));
+    }
+
+    .orb.b {
+      width: 230px;
+      height: 230px;
+      right: 8%;
+      top: 14%;
+      background: radial-gradient(circle, rgba(29, 78, 216, 0.28), rgba(29, 78, 216, 0));
+      animation-delay: 1.2s;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0) translateX(0); }
+      50% { transform: translateY(-12px) translateX(6px); }
+      100% { transform: translateY(0) translateX(0); }
     }
 
     .wrap {
-      width: min(1180px, calc(100% - 40px));
+      width: min(1080px, calc(100% - 40px));
       margin: 0 auto;
     }
 
     nav {
       position: sticky;
       top: 16px;
-      z-index: 50;
+      z-index: 40;
       margin: 16px auto 0;
-      width: min(1180px, calc(100% - 40px));
+      width: min(1080px, calc(100% - 40px));
       background: rgba(255, 255, 255, 0.78);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.9);
@@ -90,8 +132,7 @@
     .nav-links {
       list-style: none;
       display: flex;
-      gap: 20px;
-      align-items: center;
+      gap: 18px;
       flex-wrap: wrap;
     }
 
@@ -99,7 +140,26 @@
       text-decoration: none;
       color: var(--ink);
       font-weight: 700;
-      font-size: 0.92rem;
+      font-size: 0.9rem;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -5px;
+      width: 100%;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(120deg, var(--sun), var(--aqua));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.2s ease;
+    }
+
+    .nav-links a:hover::after {
+      transform: scaleX(1);
     }
 
     .btn {
@@ -113,7 +173,6 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
       padding: 12px 18px;
     }
 
@@ -125,6 +184,23 @@
       color: #fff;
       background: linear-gradient(130deg, var(--sun), #f44f1a);
       box-shadow: 0 14px 32px rgba(244, 79, 26, 0.35);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -120%;
+      width: 120%;
+      height: 100%;
+      background: linear-gradient(95deg, transparent, rgba(255, 255, 255, 0.34), transparent);
+      transition: left 0.4s ease;
+    }
+
+    .btn-primary:hover::before {
+      left: 120%;
     }
 
     .btn-secondary {
@@ -134,22 +210,43 @@
     }
 
     .hero {
-      padding: 76px 0 52px;
-      position: relative;
+      padding: 72px 0 42px;
     }
 
     .hero-grid {
       display: grid;
       grid-template-columns: 1.2fr 0.8fr;
-      gap: 24px;
+      gap: 20px;
       align-items: stretch;
+    }
+
+    .hero-copy,
+    .hero-panel,
+    .card,
+    .tester-shell,
+    .endpoint {
+      opacity: 0;
+      transform: translateY(18px);
+      animation: riseIn 0.65s ease forwards;
+    }
+
+    .hero-panel { animation-delay: 0.08s; }
+    .card:nth-child(1) { animation-delay: 0.12s; }
+    .card:nth-child(2) { animation-delay: 0.18s; }
+    .card:nth-child(3) { animation-delay: 0.24s; }
+
+    @keyframes riseIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .hero-copy {
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.62));
       border: 1px solid #fff;
       border-radius: var(--radius);
-      padding: 34px;
+      padding: 32px;
       box-shadow: var(--shadow);
     }
 
@@ -159,15 +256,15 @@
       letter-spacing: 0.11em;
       font-weight: 700;
       color: var(--cobalt);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     h1 {
       font-family: "Bricolage Grotesque", sans-serif;
-      font-size: clamp(2.2rem, 5.4vw, 4.6rem);
+      font-size: clamp(2.1rem, 5vw, 4.3rem);
       line-height: 0.95;
       letter-spacing: -0.03em;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .gradient-text {
@@ -178,15 +275,22 @@
     }
 
     .hero-subtitle {
+      color: var(--muted-2);
+      margin-bottom: 18px;
       max-width: 56ch;
+    }
+
+    .quick-list {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 22px;
       color: var(--muted);
-      margin-bottom: 24px;
-      font-size: 1.05rem;
+      font-size: 0.95rem;
     }
 
     .hero-actions {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
     }
 
@@ -194,22 +298,9 @@
       border-radius: var(--radius);
       background: linear-gradient(170deg, #0f172a, #1e293b);
       color: #e5e7eb;
-      padding: 28px;
+      padding: 26px;
       box-shadow: var(--shadow);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-panel::after {
-      content: "";
-      position: absolute;
-      width: 260px;
-      height: 260px;
-      border-radius: 999px;
-      right: -100px;
-      top: -100px;
-      background: radial-gradient(circle, rgba(14, 165, 163, 0.4), transparent 70%);
-      filter: blur(5px);
+      border: 1px solid rgba(148, 163, 184, 0.28);
     }
 
     .pulse {
@@ -230,142 +321,66 @@
       100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
     }
 
-    .stack {
-      margin-top: 16px;
-      display: grid;
-      gap: 10px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .stack-item {
-      border-radius: 12px;
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      padding: 12px;
-      background: rgba(15, 23, 42, 0.45);
-      font-size: 0.88rem;
-    }
-
-    .stats {
-      padding: 18px;
-      margin-top: 24px;
-      border-radius: 16px;
-      background: #fff;
-      border: 1px solid var(--line);
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
-      box-shadow: var(--shadow);
-    }
-
-    .stat {
-      text-align: center;
-      padding: 8px;
-    }
-
-    .stat strong {
-      display: block;
-      font-family: "Bricolage Grotesque", sans-serif;
-      font-size: 1.8rem;
-      line-height: 1;
-      color: var(--cobalt);
-    }
-
-    .stat small {
-      color: var(--muted);
-      font-weight: 500;
-    }
-
     section {
-      padding: 70px 0;
+      padding: 42px 0;
     }
 
     .section-head {
-      margin-bottom: 24px;
+      margin-bottom: 18px;
     }
 
     .section-head h2 {
       font-family: "Bricolage Grotesque", sans-serif;
       letter-spacing: -0.02em;
-      font-size: clamp(1.8rem, 3.8vw, 2.8rem);
-      margin-bottom: 10px;
+      font-size: clamp(1.7rem, 3.8vw, 2.6rem);
+      margin-bottom: 8px;
     }
 
     .section-head p {
-      color: var(--muted);
-      max-width: 66ch;
+      color: var(--muted-2);
+      max-width: 64ch;
     }
 
     .grid-3 {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
+      gap: 14px;
     }
 
     .card {
       border-radius: 16px;
       background: var(--paper-2);
       border: 1px solid var(--line);
-      padding: 20px;
+      padding: 18px;
       box-shadow: 0 8px 26px rgba(15, 23, 42, 0.06);
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-soft);
     }
 
     .card h3 {
-      font-size: 1.07rem;
-      margin-bottom: 10px;
+      font-size: 1.04rem;
+      margin-bottom: 8px;
     }
 
     .card p {
-      color: var(--muted);
-      font-size: 0.95rem;
-      line-height: 1.55;
+      color: var(--muted-2);
+      font-size: 0.94rem;
     }
 
-    .badge {
-      display: inline-block;
-      border-radius: 999px;
-      border: 1px solid #d6e4ff;
-      color: var(--cobalt);
-      background: #edf4ff;
-      font-size: 0.72rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 4px 10px;
-      margin-bottom: 10px;
-      font-weight: 700;
-    }
-
-    .timeline {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .step {
-      background: linear-gradient(160deg, #fff, #f4f9ff);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 18px;
-      min-height: 170px;
-    }
-
-    .step-index {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, var(--aqua), #0c7f8f);
-      color: #fff;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      margin-bottom: 12px;
-    }
-
-    .api-section {
+    .api-strip {
       background: linear-gradient(180deg, #fbfdff, #f4f6ff);
       border-top: 1px solid #e4e7f5;
       border-bottom: 1px solid #e4e7f5;
+    }
+
+    .endpoint-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
     }
 
     .endpoint {
@@ -373,7 +388,12 @@
       border: 1px solid #d9e1ff;
       border-left: 4px solid var(--cobalt);
       border-radius: 12px;
-      padding: 16px;
+      padding: 14px;
+      transition: transform 0.2s ease;
+    }
+
+    .endpoint:hover {
+      transform: translateY(-3px);
     }
 
     .method {
@@ -381,7 +401,7 @@
       border-radius: 999px;
       padding: 5px 10px;
       font-weight: 700;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       background: #dce7ff;
       color: #0f2f7a;
       margin-bottom: 8px;
@@ -391,7 +411,18 @@
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-weight: 700;
       word-break: break-all;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
+    }
+
+    code.inline-code {
+      background: #eef3ff;
+      color: #12398e;
+      border: 1px solid #d7e3ff;
+      border-radius: 6px;
+      padding: 1px 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.85em;
+      font-weight: 700;
     }
 
     .tester-shell {
@@ -402,22 +433,23 @@
       display: grid;
       grid-template-columns: 1.05fr 0.95fr;
       overflow: hidden;
+      animation-delay: 0.12s;
     }
 
     .tester-left {
-      padding: 26px;
+      padding: 24px;
       background: linear-gradient(165deg, #ffffff, #f5f7ff);
     }
 
     .tester-right {
-      padding: 26px;
+      padding: 24px;
       border-left: 1px solid var(--line);
       background: #0f172a;
       color: #e2e8f0;
     }
 
     .form-group {
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
     label {
@@ -462,42 +494,21 @@
       display: block;
     }
 
+    .send-btn {
+      width: 100%;
+    }
+
     footer {
-      padding: 34px 0 48px;
+      padding: 30px 0 44px;
       color: #475569;
       font-size: 0.9rem;
       text-align: center;
     }
 
-    .reveal {
-      opacity: 0;
-      transform: translateY(22px);
-      transition: opacity 0.65s ease, transform 0.65s ease;
-    }
-
-    .reveal.is-visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .hero-copy,
-    .hero-panel,
-    .stats {
-      animation: riseIn 0.7s ease both;
-    }
-
-    .hero-panel { animation-delay: 0.1s; }
-    .stats { animation-delay: 0.2s; }
-
-    @keyframes riseIn {
-      from { opacity: 0; transform: translateY(24px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
     @media (max-width: 1024px) {
       .hero-grid,
       .tester-shell,
-      .timeline {
+      .endpoint-grid {
         grid-template-columns: 1fr;
       }
 
@@ -516,8 +527,7 @@
     }
 
     @media (max-width: 680px) {
-      .grid-3,
-      .stats {
+      .grid-3 {
         grid-template-columns: 1fr;
       }
 
@@ -528,118 +538,111 @@
         padding: 20px;
       }
 
-      .nav-links {
-        gap: 10px;
-      }
-
       .btn {
-        width: 100%;
-      }
-
-      .hero-actions {
         width: 100%;
       }
     }
   </style>
 </head>
 <body>
+  <div class="ambient">
+    <div class="orb a"></div>
+    <div class="orb b"></div>
+  </div>
+
   <nav>
-    <a class="logo" href="#">Agentic<span>Honeypot</span></a>
+    <a class="logo" href="index.html">Agentic<span>Honeypot</span></a>
     <ul class="nav-links">
-      <li><a href="#features">Features</a></li>
-      <li><a href="#how-it-works">Flow</a></li>
+      <li><a href="#overview">Overview</a></li>
       <li><a href="#api">API</a></li>
-      <li><a href="#tester">Live Tester</a></li>
+      <li><a href="#tester">Tester</a></li>
+      <li><a href="docs.html">Docs</a></li>
+      <li><a href="contact.html">Contact</a></li>
     </ul>
   </nav>
 
-  <header class="hero">
+  <header id="overview" class="hero">
     <div class="wrap">
       <div class="hero-grid">
         <div class="hero-copy">
           <p class="eyebrow">Autonomous Scam Engagement Platform</p>
-          <h1>Built To <span class="gradient-text">Outplay</span> Fraud Scripts In Real Time.</h1>
-          <p class="hero-subtitle">Detect social engineering attempts, engage threat actors through adaptive personas, and extract actionable intelligence before real users are impacted.</p>
-          <div class="hero-actions">
-            <a href="#tester" class="btn btn-primary">Launch Live Demo</a>
-            <a href="#api" class="btn btn-secondary">Read API Spec</a>
+          <h1>Adaptive <span class="gradient-text">Scam Defense</span> For Real-World Ops.</h1>
+          <p class="hero-subtitle">Minimal interface, maximum utility: detect scam intent, engage safely, and capture intelligence from hostile conversations.</p>
+          <div class="quick-list">
+            <div>1. Threat classification with confidence metadata.</div>
+            <div>2. Stateful conversation engine for controlled engagement.</div>
+            <div>3. Structured entity extraction for security workflows.</div>
           </div>
-          <div class="stats">
-            <div class="stat"><strong>16</strong><small>Scam classes</small></div>
-            <div class="stat"><strong>&lt;500ms</strong><small>Median response</small></div>
-            <div class="stat"><strong>5</strong><small>Core endpoints</small></div>
-            <div class="stat"><strong>24x7</strong><small>Automation loop</small></div>
+          <div class="hero-actions">
+            <a href="#tester" class="btn btn-primary">Launch Tester</a>
+            <a href="#api" class="btn btn-secondary">View Endpoints</a>
           </div>
         </div>
         <aside class="hero-panel">
           <h3><span class="pulse"></span>System Status: Active</h3>
-          <p style="margin-top:8px;color:#cbd5e1;">Conversation shaping engine is online and adapting strategy by turn, confidence, and extracted entities.</p>
-          <div class="stack">
-            <div class="stack-item">Threat Signal: <strong>UPI Phishing</strong> at 94.2% confidence</div>
-            <div class="stack-item">Phase Shift: <strong>build_trust -&gt; extract_intelligence</strong></div>
-            <div class="stack-item">Entities Captured: <strong>upi_ids, phone_numbers, phishing_links</strong></div>
-          </div>
+          <p>Core detection and response loop is running with API key protection and live endpoint access.</p>
         </aside>
       </div>
     </div>
   </header>
 
-  <section id="features">
+  <section>
     <div class="wrap">
-      <div class="section-head reveal">
-        <h2>Defense Engine, Not Just Detection.</h2>
-        <p>Every feature is tuned for adversarial conversations: classify threat intent, generate believable responses, and capture high-value indicators without exposing real operators.</p>
-      </div>
       <div class="grid-3">
-        <article class="card reveal"><span class="badge">Detection</span><h3>Pattern + Context Scoring</h3><p>Hybrid rule logic identifies phishing, lottery, fake support, romance, extortion, and impersonation attempts with confidence metadata.</p></article>
-        <article class="card reveal"><span class="badge">Agent</span><h3>Multi-Phase Dialogue Strategy</h3><p>Conversation flow transitions from identification to trust-building, extraction, delay, and safe exit based on turn count and threat confidence.</p></article>
-        <article class="card reveal"><span class="badge">Intel</span><h3>Entity Capture Pipeline</h3><p>Extracts UPI IDs, account numbers, links, phone numbers, and emails, then stores them with confidence values for post-analysis.</p></article>
-        <article class="card reveal"><span class="badge">Memory</span><h3>Stateful Conversations</h3><p>Tracks per-conversation state, history, phase, and trust level so long engagements remain coherent and operationally useful.</p></article>
-        <article class="card reveal"><span class="badge">API</span><h3>Simple Integration Surface</h3><p>Flask endpoints with API key auth, CORS support, predictable JSON structures, and robust error handling for production pipelines.</p></article>
-        <article class="card reveal"><span class="badge">Ops</span><h3>Fast Local + Cloud Workflow</h3><p>Use the same frontend tester locally against `main.py` or deploy behind your preferred edge/runtime without changing the UI flow.</p></article>
+        <article class="card">
+          <h3>Detect</h3>
+          <p>Classifies scam patterns from incoming text and returns risk metadata.</p>
+        </article>
+        <article class="card">
+          <h3>Engage</h3>
+          <p>Runs adaptive responses across conversation stages without exposing a real operator.</p>
+        </article>
+        <article class="card">
+          <h3>Extract</h3>
+          <p>Captures links, IDs, phone numbers, and contact artifacts for follow-up analysis.</p>
+        </article>
       </div>
     </div>
   </section>
 
-  <section id="how-it-works">
+  <section id="api" class="api-strip">
     <div class="wrap">
-      <div class="section-head reveal">
-        <h2>Five Strategic Stages</h2>
-        <p>Engagement logic follows an intentional arc that maximizes intelligence extraction while minimizing operator risk.</p>
+      <div class="section-head">
+        <h2>Essential API Endpoints</h2>
+        <p>Protected endpoints require <code class="inline-code">X-API-Key: test_key_12345</code>.</p>
       </div>
-      <div class="timeline">
-        <div class="step reveal"><div class="step-index">1</div><h3>Identify</h3><p>Detect malicious framing and classify likely scam family.</p></div>
-        <div class="step reveal"><div class="step-index">2</div><h3>Build Trust</h3><p>Respond as a plausible target to avoid early scammer drop-off.</p></div>
-        <div class="step reveal"><div class="step-index">3</div><h3>Extract</h3><p>Collect transaction channels, accounts, links, and contact artifacts.</p></div>
-        <div class="step reveal"><div class="step-index">4</div><h3>Delay</h3><p>Use controlled hesitation to prolong thread and gather more signals.</p></div>
-        <div class="step reveal"><div class="step-index">5</div><h3>Exit</h3><p>Close interaction safely after useful intelligence has been secured.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="api" class="api-section">
-    <div class="wrap">
-      <div class="section-head reveal">
-        <h2>API Endpoints</h2>
-        <p>All protected endpoints require `X-API-Key: test_key_12345`.</p>
-      </div>
-      <div class="grid-3">
-        <article class="endpoint reveal"><div class="method">GET</div><div class="path">/health</div><p>Service health and active conversation count.</p></article>
-        <article class="endpoint reveal"><div class="method">POST</div><div class="path">/api/v1/detect-scam</div><p>Classifies message risk and returns detection metadata.</p></article>
-        <article class="endpoint reveal"><div class="method">POST</div><div class="path">/api/v1/conversation</div><p>Creates a new conversation and returns `conversation_id`.</p></article>
-        <article class="endpoint reveal"><div class="method">POST</div><div class="path">/api/v1/conversation/{id}/message</div><p>Processes incoming scammer text and returns agent response.</p></article>
-        <article class="endpoint reveal"><div class="method">GET</div><div class="path">/api/v1/conversation/{id}</div><p>Fetches current memory state and extracted intelligence.</p></article>
+      <div class="endpoint-grid">
+        <article class="endpoint">
+          <div class="method">GET</div>
+          <div class="path">/health</div>
+          <p>Service status and active conversation count.</p>
+        </article>
+        <article class="endpoint">
+          <div class="method">POST</div>
+          <div class="path">/api/v1/detect-scam</div>
+          <p>Detects likely scam intent from a message payload.</p>
+        </article>
+        <article class="endpoint">
+          <div class="method">POST</div>
+          <div class="path">/api/v1/conversation</div>
+          <p>Creates a conversation and returns <code class="inline-code">conversation_id</code>.</p>
+        </article>
+        <article class="endpoint">
+          <div class="method">POST</div>
+          <div class="path">/api/v1/conversation/{id}/message</div>
+          <p>Processes an incoming message and returns agent output.</p>
+        </article>
       </div>
     </div>
   </section>
 
   <section id="tester">
     <div class="wrap">
-      <div class="section-head reveal">
+      <div class="section-head">
         <h2>Live API Tester</h2>
-        <p>Use this pane to hit your local Flask server running from `main.py`.</p>
+        <p>Send requests directly to your running backend.</p>
       </div>
-      <div class="tester-shell reveal">
+      <div class="tester-shell">
         <div class="tester-left">
           <div class="form-group">
             <label for="apiKey">API Key</label>
@@ -648,7 +651,7 @@
 
           <div class="form-group">
             <label for="endpoint">Endpoint</label>
-            <input type="text" id="endpoint" value="" readonly>
+            <input type="text" id="endpoint" value="" placeholder="https://your-live-backend.example.com">
           </div>
 
           <div class="form-group">
@@ -665,13 +668,13 @@
             <textarea id="requestBody" placeholder='{"message":"Verify your UPI account immediately"}'></textarea>
           </div>
 
-          <button class="btn btn-primary" style="width:100%;" onclick="testAPI()">Send Request</button>
+          <button class="btn btn-primary send-btn" onclick="testAPI()">Send Request</button>
         </div>
 
         <div class="tester-right">
-          <h3 style="margin-bottom:12px;">Response</h3>
+          <h3>Response</h3>
           <div id="response" class="response-box">Ready.
-Choose a path, edit JSON if needed, then send.</div>
+Choose a path and send the request.</div>
         </div>
       </div>
     </div>
@@ -684,9 +687,26 @@ Choose a path, edit JSON if needed, then send.</div>
   </footer>
 
   <script>
+    function normalizeEndpoint(value) {
+      return (value || "").trim().replace(/\/+$/, "");
+    }
+
+    function resolveInitialEndpoint() {
+      const params = new URLSearchParams(window.location.search);
+      const fromQuery = normalizeEndpoint(params.get("apiBase"));
+      const fromStorage = normalizeEndpoint(localStorage.getItem("apiBaseUrl"));
+      return fromQuery || fromStorage || window.location.origin;
+    }
+
+    function persistEndpoint() {
+      const endpointInput = document.getElementById("endpoint");
+      endpointInput.value = normalizeEndpoint(endpointInput.value);
+      localStorage.setItem("apiBaseUrl", endpointInput.value);
+    }
+
     async function testAPI() {
       const apiKey = document.getElementById("apiKey").value;
-      const endpoint = document.getElementById("endpoint").value;
+      const endpoint = normalizeEndpoint(document.getElementById("endpoint").value);
       const path = document.getElementById("path").value;
       const requestBody = document.getElementById("requestBody").value;
       const responseBox = document.getElementById("response");
@@ -699,7 +719,6 @@ Choose a path, edit JSON if needed, then send.</div>
 
       try {
         responseBox.textContent = "Sending request...";
-
         const options = {
           method: path === "/health" ? "GET" : "POST",
           headers: {
@@ -734,16 +753,12 @@ Choose a path, edit JSON if needed, then send.</div>
 
     document.getElementById("path").addEventListener("change", function () {
       const requestBody = document.getElementById("requestBody");
-
       switch (this.value) {
         case "/api/v1/detect-scam":
-          requestBody.value = '{"message": "Verify your UPI account immediately"}';
+          requestBody.value = '{"message":"Verify your UPI account immediately"}';
           break;
         case "/api/v1/conversation":
-          requestBody.value = '{"persona_name": "victim_001"}';
-          break;
-        case "/health":
-          requestBody.value = "";
+          requestBody.value = '{"persona_name":"victim_001"}';
           break;
         default:
           requestBody.value = "";
@@ -751,21 +766,12 @@ Choose a path, edit JSON if needed, then send.</div>
       }
     });
 
-    document.getElementById("endpoint").value = window.location.origin;
-    document.getElementById("requestBody").value = '{"message": "Verify your UPI account immediately"}';
+    const endpointInput = document.getElementById("endpoint");
+    endpointInput.value = resolveInitialEndpoint();
+    endpointInput.addEventListener("change", persistEndpoint);
+    endpointInput.addEventListener("blur", persistEndpoint);
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-          }
-        });
-      },
-      { threshold: 0.12, rootMargin: "0px 0px -60px 0px" }
-    );
-
-    document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+    document.getElementById("requestBody").value = '{"message":"Verify your UPI account immediately"}';
   </script>
 </body>
 </html>

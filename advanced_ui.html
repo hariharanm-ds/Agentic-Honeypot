@@ -699,7 +699,18 @@
     </div>
 
     <script>
-        const API_BASE = 'http://localhost:5000';
+        function normalizeApiBase(value) {
+            return (value || '').trim().replace(/\/+$/, '');
+        }
+
+        function resolveApiBase() {
+            const params = new URLSearchParams(window.location.search);
+            const fromQuery = normalizeApiBase(params.get('apiBase'));
+            const fromStorage = normalizeApiBase(localStorage.getItem('apiBaseUrl'));
+            return fromQuery || fromStorage || window.location.origin;
+        }
+
+        const API_BASE = resolveApiBase();
         const API_KEY = 'test_key_12345';
         let currentConversationId = null;
         let messageCount = 0;
