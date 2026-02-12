@@ -3,7 +3,7 @@ Agentic Honeypot - Complete Production API
 A sophisticated scam detection and engagement system using autonomous agents
 """
 
-from flask import Flask, request, jsonify, Request
+from flask import Flask, request, jsonify, Request, send_from_directory
 from flask_cors import CORS
 from datetime import datetime
 import uuid
@@ -583,7 +583,9 @@ def generate_victim_response(message: str, scam_type) -> str:
 
 @app.route('/', methods=['GET', 'POST', 'HEAD'])
 def root():
-    """Root health check - accepts GET, POST, HEAD - returns 200 OK with JSON"""
+    """Serve landing page on GET and keep JSON health check for API methods."""
+    if request.method == 'GET':
+        return send_from_directory(app.root_path, 'index.html')
     return jsonify({
         "status": "ok",
         "service": "agentic-honeypot",

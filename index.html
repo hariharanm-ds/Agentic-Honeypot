@@ -1,845 +1,771 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agentic Honeypot - Advanced Scam Detection & Engagement Platform</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #0066ff;
-            --secondary: #ff6b6b;
-            --success: #51cf66;
-            --dark: #1a1a2e;
-            --light: #f5f7fa;
-            --border: #e0e0e0;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #333;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* Navigation */
-        nav {
-            background: linear-gradient(135deg, var(--dark) 0%, #16213e 100%);
-            color: white;
-            padding: 1.5rem 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 700;
-            letter-spacing: -1px;
-            background: linear-gradient(135deg, #0066ff, #00ccff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        nav a {
-            color: white;
-            text-decoration: none;
-            transition: color 0.3s;
-            font-weight: 500;
-        }
-
-        nav a:hover {
-            color: var(--primary);
-        }
-
-        .btn {
-            padding: 0.8rem 1.5rem;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: all 0.3s;
-            display: inline-block;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), #0052cc);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
-        }
-
-        .btn-secondary {
-            background: white;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-        }
-
-        .btn-secondary:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            color: white;
-            padding: 6rem 5%;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(0, 102, 255, 0.1) 0%, transparent 70%);
-            border-radius: 50%;
-        }
-
-        .hero::after {
-            content: '';
-            position: absolute;
-            bottom: -30%;
-            left: -10%;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(255, 107, 107, 0.1) 0%, transparent 70%);
-            border-radius: 50%;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 1;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .hero h1 {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-            font-weight: 700;
-            line-height: 1.2;
-        }
-
-        .hero-subtitle {
-            font-size: 1.3rem;
-            margin-bottom: 2rem;
-            color: #e0e0e0;
-            font-weight: 300;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 2rem;
-        }
-
-        /* Stats */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-            margin-top: 4rem;
-            padding: 2rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-        }
-
-        .stat {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            font-size: 0.95rem;
-            color: #b0b0b0;
-        }
-
-        /* Features Section */
-        .features {
-            padding: 5rem 5%;
-            background: var(--light);
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: var(--dark);
-        }
-
-        .section-subtitle {
-            text-align: center;
-            font-size: 1.1rem;
-            color: #666;
-            margin-bottom: 3rem;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-        }
-
-        .feature-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s;
-            border-left: 4px solid var(--primary);
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-        }
-
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            display: inline-block;
-        }
-
-        .feature-card h3 {
-            font-size: 1.3rem;
-            margin-bottom: 0.8rem;
-            color: var(--dark);
-        }
-
-        .feature-card p {
-            color: #666;
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-
-        /* How It Works */
-        .how-it-works {
-            padding: 5rem 5%;
-            background: white;
-        }
-
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-
-        .step {
-            position: relative;
-            padding: 2rem;
-            background: linear-gradient(135deg, rgba(0, 102, 255, 0.05) 0%, rgba(0, 204, 255, 0.05) 100%);
-            border-radius: 12px;
-            border: 1px solid rgba(0, 102, 255, 0.2);
-            text-align: center;
-        }
-
-        .step-number {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, var(--primary), #0052cc);
-            color: white;
-            border-radius: 50%;
-            font-weight: 700;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .step h3 {
-            font-size: 1.2rem;
-            margin-bottom: 0.8rem;
-            color: var(--dark);
-        }
-
-        /* API Documentation */
-        .api-docs {
-            padding: 5rem 5%;
-            background: var(--dark);
-            color: white;
-        }
-
-        .api-docs .section-title,
-        .api-docs .section-subtitle {
-            color: white;
-        }
-
-        .api-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-
-        .endpoint {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 2rem;
-            border-radius: 12px;
-            border-left: 4px solid var(--primary);
-            backdrop-filter: blur(10px);
-        }
-
-        .endpoint-method {
-            display: inline-block;
-            padding: 0.4rem 0.8rem;
-            background: var(--primary);
-            color: white;
-            border-radius: 4px;
-            font-weight: 700;
-            font-size: 0.85rem;
-            margin-bottom: 0.8rem;
-        }
-
-        .endpoint-path {
-            font-family: 'Courier New', monospace;
-            font-size: 0.95rem;
-            word-break: break-all;
-            color: #00ccff;
-            margin-bottom: 1rem;
-        }
-
-        .endpoint-desc {
-            font-size: 0.95rem;
-            color: #e0e0e0;
-            line-height: 1.6;
-        }
-
-        /* Live Tester */
-        .live-tester {
-            padding: 5rem 5%;
-            background: linear-gradient(135deg, var(--light) 0%, #e8f0ff 100%);
-        }
-
-        .tester-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 3rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--dark);
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 0.8rem;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.95rem;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
-        }
-
-        .response-box {
-            background: var(--dark);
-            color: #00ccff;
-            padding: 1.5rem;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            margin-top: 1.5rem;
-            display: none;
-            max-height: 300px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-
-        .response-box.show {
-            display: block;
-        }
-
-        /* Footer */
-        footer {
-            background: var(--dark);
-            color: white;
-            padding: 3rem 5%;
-            text-align: center;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-            text-align: left;
-        }
-
-        .footer-section h4 {
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-
-        .footer-section ul {
-            list-style: none;
-        }
-
-        .footer-section ul li {
-            margin-bottom: 0.5rem;
-        }
-
-        .footer-section a {
-            color: #b0b0b0;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .footer-section a:hover {
-            color: var(--primary);
-        }
-
-        .footer-bottom {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 2rem;
-            color: #888;
-        }
-
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .fade-in-up {
-            animation: fadeInUp 0.6s ease-out;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2rem;
-            }
-
-            nav ul {
-                gap: 1rem;
-                font-size: 0.9rem;
-            }
-
-            .hero-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .btn {
-                width: 100%;
-                text-align: center;
-            }
-
-            .stats {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agentic Honeypot | Adaptive Scam Defense</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #0f172a;
+      --paper: #f6f6ef;
+      --paper-2: #ffffff;
+      --line: #d7d8cb;
+      --aqua: #0ea5a3;
+      --sun: #ff7a18;
+      --cobalt: #1d4ed8;
+      --muted: #596071;
+      --radius: 20px;
+      --shadow: 0 22px 50px rgba(15, 23, 42, 0.11);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Space Grotesk", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at 15% 15%, #fff3dc 0%, transparent 42%),
+                  radial-gradient(circle at 85% 5%, #dff8ff 0%, transparent 35%),
+                  var(--paper);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: linear-gradient(transparent 96%, rgba(15, 23, 42, 0.03) 100%);
+      background-size: 100% 6px;
+      opacity: 0.35;
+      z-index: -1;
+    }
+
+    .wrap {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    nav {
+      position: sticky;
+      top: 16px;
+      z-index: 50;
+      margin: 16px auto 0;
+      width: min(1180px, calc(100% - 40px));
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .logo {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      font-size: 1.1rem;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .logo span {
+      color: var(--sun);
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .btn {
+      border: 0;
+      font-family: "Space Grotesk", sans-serif;
+      cursor: pointer;
+      font-weight: 700;
+      text-decoration: none;
+      border-radius: 999px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 18px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-primary {
+      color: #fff;
+      background: linear-gradient(130deg, var(--sun), #f44f1a);
+      box-shadow: 0 14px 32px rgba(244, 79, 26, 0.35);
+    }
+
+    .btn-secondary {
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .hero {
+      padding: 76px 0 52px;
+      position: relative;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .hero-copy {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.62));
+      border: 1px solid #fff;
+      border-radius: var(--radius);
+      padding: 34px;
+      box-shadow: var(--shadow);
+    }
+
+    .eyebrow {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.11em;
+      font-weight: 700;
+      color: var(--cobalt);
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: clamp(2.2rem, 5.4vw, 4.6rem);
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(140deg, var(--cobalt), var(--aqua));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-subtitle {
+      max-width: 56ch;
+      color: var(--muted);
+      margin-bottom: 24px;
+      font-size: 1.05rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .hero-panel {
+      border-radius: var(--radius);
+      background: linear-gradient(170deg, #0f172a, #1e293b);
+      color: #e5e7eb;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-panel::after {
+      content: "";
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 999px;
+      right: -100px;
+      top: -100px;
+      background: radial-gradient(circle, rgba(14, 165, 163, 0.4), transparent 70%);
+      filter: blur(5px);
+    }
+
+    .pulse {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+      animation: pulse 2s infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+      70% { box-shadow: 0 0 0 12px rgba(34, 197, 94, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+
+    .stack {
+      margin-top: 16px;
+      display: grid;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stack-item {
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      padding: 12px;
+      background: rgba(15, 23, 42, 0.45);
+      font-size: 0.88rem;
+    }
+
+    .stats {
+      padding: 18px;
+      margin-top: 24px;
+      border-radius: 16px;
+      background: #fff;
+      border: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat {
+      text-align: center;
+      padding: 8px;
+    }
+
+    .stat strong {
+      display: block;
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 1.8rem;
+      line-height: 1;
+      color: var(--cobalt);
+    }
+
+    .stat small {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    section {
+      padding: 70px 0;
+    }
+
+    .section-head {
+      margin-bottom: 24px;
+    }
+
+    .section-head h2 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      letter-spacing: -0.02em;
+      font-size: clamp(1.8rem, 3.8vw, 2.8rem);
+      margin-bottom: 10px;
+    }
+
+    .section-head p {
+      color: var(--muted);
+      max-width: 66ch;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      border-radius: 16px;
+      background: var(--paper-2);
+      border: 1px solid var(--line);
+      padding: 20px;
+      box-shadow: 0 8px 26px rgba(15, 23, 42, 0.06);
+    }
+
+    .card h3 {
+      font-size: 1.07rem;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+
+    .badge {
+      display: inline-block;
+      border-radius: 999px;
+      border: 1px solid #d6e4ff;
+      color: var(--cobalt);
+      background: #edf4ff;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .step {
+      background: linear-gradient(160deg, #fff, #f4f9ff);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 18px;
+      min-height: 170px;
+    }
+
+    .step-index {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--aqua), #0c7f8f);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .api-section {
+      background: linear-gradient(180deg, #fbfdff, #f4f6ff);
+      border-top: 1px solid #e4e7f5;
+      border-bottom: 1px solid #e4e7f5;
+    }
+
+    .endpoint {
+      background: #fff;
+      border: 1px solid #d9e1ff;
+      border-left: 4px solid var(--cobalt);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .method {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-weight: 700;
+      font-size: 0.8rem;
+      background: #dce7ff;
+      color: #0f2f7a;
+      margin-bottom: 8px;
+    }
+
+    .path {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-weight: 700;
+      word-break: break-all;
+      margin-bottom: 8px;
+    }
+
+    .tester-shell {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      overflow: hidden;
+    }
+
+    .tester-left {
+      padding: 26px;
+      background: linear-gradient(165deg, #ffffff, #f5f7ff);
+    }
+
+    .tester-right {
+      padding: 26px;
+      border-left: 1px solid var(--line);
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.86rem;
+      margin-bottom: 6px;
+      color: #384458;
+      font-weight: 700;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid #cdd2df;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.92rem;
+      background: #fff;
+      color: #111827;
+    }
+
+    textarea {
+      min-height: 124px;
+      resize: vertical;
+    }
+
+    .response-box {
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.55);
+      min-height: 280px;
+      max-height: 430px;
+      overflow: auto;
+      padding: 14px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      display: block;
+    }
+
+    footer {
+      padding: 34px 0 48px;
+      color: #475569;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .hero-copy,
+    .hero-panel,
+    .stats {
+      animation: riseIn 0.7s ease both;
+    }
+
+    .hero-panel { animation-delay: 0.1s; }
+    .stats { animation-delay: 0.2s; }
+
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 1024px) {
+      .hero-grid,
+      .tester-shell,
+      .timeline {
+        grid-template-columns: 1fr;
+      }
+
+      .grid-3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .tester-right {
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+
+      nav {
+        position: static;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .grid-3,
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-copy,
+      .hero-panel,
+      .tester-left,
+      .tester-right {
+        padding: 20px;
+      }
+
+      .nav-links {
+        gap: 10px;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .hero-actions {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav>
-        <div class="logo">🍯 Agentic Honeypot</div>
-        <ul>
-            <li><a href="#features">Features</a></li>
-            <li><a href="#how-it-works">How It Works</a></li>
-            <li><a href="#api">API</a></li>
-            <li><a href="#tester">Live Tester</a></li>
-        </ul>
-    </nav>
+  <nav>
+    <a class="logo" href="#">Agentic<span>Honeypot</span></a>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how-it-works">Flow</a></li>
+      <li><a href="#api">API</a></li>
+      <li><a href="#tester">Live Tester</a></li>
+    </ul>
+  </nav>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content fade-in-up">
-            <h1>Advanced AI-Powered Scam Detection & Honeypot Engagement</h1>
-            <p class="hero-subtitle">Detect fraudsters, engage automatically, and extract actionable intelligence in real-time</p>
-            
-            <div class="hero-buttons">
-                <a href="#tester" class="btn btn-primary">Try Live Demo</a>
-                <a href="#api" class="btn btn-secondary">API Documentation</a>
-                <a href="https://ai-agentic-honeypot.vercel.app/" target="_blank" class="btn btn-primary">Live Endpoint</a>
-            </div>
-
-            <div class="stats">
-                <div class="stat">
-                    <div class="stat-number">6+</div>
-                    <div class="stat-label">Scam Types Detected</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">100%</div>
-                    <div class="stat-label">Uptime SLA</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">&lt;500ms</div>
-                    <div class="stat-label">Response Time</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">5</div>
-                    <div class="stat-label">API Endpoints</div>
-                </div>
-            </div>
+  <header class="hero">
+    <div class="wrap">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Autonomous Scam Engagement Platform</p>
+          <h1>Built To <span class="gradient-text">Outplay</span> Fraud Scripts In Real Time.</h1>
+          <p class="hero-subtitle">Detect social engineering attempts, engage threat actors through adaptive personas, and extract actionable intelligence before real users are impacted.</p>
+          <div class="hero-actions">
+            <a href="#tester" class="btn btn-primary">Launch Live Demo</a>
+            <a href="#api" class="btn btn-secondary">Read API Spec</a>
+          </div>
+          <div class="stats">
+            <div class="stat"><strong>16</strong><small>Scam classes</small></div>
+            <div class="stat"><strong>&lt;500ms</strong><small>Median response</small></div>
+            <div class="stat"><strong>5</strong><small>Core endpoints</small></div>
+            <div class="stat"><strong>24x7</strong><small>Automation loop</small></div>
+          </div>
         </div>
-    </section>
+        <aside class="hero-panel">
+          <h3><span class="pulse"></span>System Status: Active</h3>
+          <p style="margin-top:8px;color:#cbd5e1;">Conversation shaping engine is online and adapting strategy by turn, confidence, and extracted entities.</p>
+          <div class="stack">
+            <div class="stack-item">Threat Signal: <strong>UPI Phishing</strong> at 94.2% confidence</div>
+            <div class="stack-item">Phase Shift: <strong>build_trust -&gt; extract_intelligence</strong></div>
+            <div class="stack-item">Entities Captured: <strong>upi_ids, phone_numbers, phishing_links</strong></div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </header>
 
-    <!-- Features Section -->
-    <section class="features" id="features">
-        <h2 class="section-title">Powerful Features</h2>
-        <p class="section-subtitle">Everything you need to combat fraud with advanced AI and autonomous agents</p>
-        
-        <div class="features-grid">
-            <div class="feature-card fade-in-up">
-                <div class="feature-icon">🎯</div>
-                <h3>Smart Scam Detection</h3>
-                <p>Detects 6+ types of scams including phishing, lottery fraud, romance scams, and investment fraud with high confidence scoring.</p>
-            </div>
+  <section id="features">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <h2>Defense Engine, Not Just Detection.</h2>
+        <p>Every feature is tuned for adversarial conversations: classify threat intent, generate believable responses, and capture high-value indicators without exposing real operators.</p>
+      </div>
+      <div class="grid-3">
+        <article class="card reveal"><span class="badge">Detection</span><h3>Pattern + Context Scoring</h3><p>Hybrid rule logic identifies phishing, lottery, fake support, romance, extortion, and impersonation attempts with confidence metadata.</p></article>
+        <article class="card reveal"><span class="badge">Agent</span><h3>Multi-Phase Dialogue Strategy</h3><p>Conversation flow transitions from identification to trust-building, extraction, delay, and safe exit based on turn count and threat confidence.</p></article>
+        <article class="card reveal"><span class="badge">Intel</span><h3>Entity Capture Pipeline</h3><p>Extracts UPI IDs, account numbers, links, phone numbers, and emails, then stores them with confidence values for post-analysis.</p></article>
+        <article class="card reveal"><span class="badge">Memory</span><h3>Stateful Conversations</h3><p>Tracks per-conversation state, history, phase, and trust level so long engagements remain coherent and operationally useful.</p></article>
+        <article class="card reveal"><span class="badge">API</span><h3>Simple Integration Surface</h3><p>Flask endpoints with API key auth, CORS support, predictable JSON structures, and robust error handling for production pipelines.</p></article>
+        <article class="card reveal"><span class="badge">Ops</span><h3>Fast Local + Cloud Workflow</h3><p>Use the same frontend tester locally against `main.py` or deploy behind your preferred edge/runtime without changing the UI flow.</p></article>
+      </div>
+    </div>
+  </section>
 
-            <div class="feature-card fade-in-up">
-                <div class="feature-icon">🤖</div>
-                <h3>Autonomous AI Agent</h3>
-                <p>Self-governing agent that adapts conversation strategy across 5 phases: identification, trust-building, intelligence extraction, delay, and safe exit.</p>
-            </div>
+  <section id="how-it-works">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <h2>Five Strategic Stages</h2>
+        <p>Engagement logic follows an intentional arc that maximizes intelligence extraction while minimizing operator risk.</p>
+      </div>
+      <div class="timeline">
+        <div class="step reveal"><div class="step-index">1</div><h3>Identify</h3><p>Detect malicious framing and classify likely scam family.</p></div>
+        <div class="step reveal"><div class="step-index">2</div><h3>Build Trust</h3><p>Respond as a plausible target to avoid early scammer drop-off.</p></div>
+        <div class="step reveal"><div class="step-index">3</div><h3>Extract</h3><p>Collect transaction channels, accounts, links, and contact artifacts.</p></div>
+        <div class="step reveal"><div class="step-index">4</div><h3>Delay</h3><p>Use controlled hesitation to prolong thread and gather more signals.</p></div>
+        <div class="step reveal"><div class="step-index">5</div><h3>Exit</h3><p>Close interaction safely after useful intelligence has been secured.</p></div>
+      </div>
+    </div>
+  </section>
 
-            <div class="feature-card fade-in-up">
-                <div class="feature-icon">🔍</div>
-                <h3>Intelligence Extraction</h3>
-                <p>Automatically extracts and validates UPI IDs, phone numbers, bank accounts, phishing links, and email addresses with confidence metrics.</p>
-            </div>
+  <section id="api" class="api-section">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <h2>API Endpoints</h2>
+        <p>All protected endpoints require `X-API-Key: test_key_12345`.</p>
+      </div>
+      <div class="grid-3">
+        <article class="endpoint reveal"><div class="method">GET</div><div class="path">/health</div><p>Service health and active conversation count.</p></article>
+        <article class="endpoint reveal"><div class="method">POST</div><div class="path">/api/v1/detect-scam</div><p>Classifies message risk and returns detection metadata.</p></article>
+        <article class="endpoint reveal"><div class="method">POST</div><div class="path">/api/v1/conversation</div><p>Creates a new conversation and returns `conversation_id`.</p></article>
+        <article class="endpoint reveal"><div class="method">POST</div><div class="path">/api/v1/conversation/{id}/message</div><p>Processes incoming scammer text and returns agent response.</p></article>
+        <article class="endpoint reveal"><div class="method">GET</div><div class="path">/api/v1/conversation/{id}</div><p>Fetches current memory state and extracted intelligence.</p></article>
+      </div>
+    </div>
+  </section>
 
-            <div class="feature-card fade-in-up">
-                <div class="feature-icon">🧠</div>
-                <h3>Realistic Persona</h3>
-                <p>Authentic human-like responses with behavioral cues, response delays, typing indicators, and contextual emotional states.</p>
-            </div>
+  <section id="tester">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <h2>Live API Tester</h2>
+        <p>Use this pane to hit your local Flask server running from `main.py`.</p>
+      </div>
+      <div class="tester-shell reveal">
+        <div class="tester-left">
+          <div class="form-group">
+            <label for="apiKey">API Key</label>
+            <input type="text" id="apiKey" value="test_key_12345" readonly>
+          </div>
 
-            <div class="feature-card fade-in-up">
-                <div class="feature-icon">📊</div>
-                <h3>Multi-turn Conversations</h3>
-                <p>Maintains conversation state across multiple turns with memory tracking, emotional intelligence, and adaptive responses.</p>
-            </div>
+          <div class="form-group">
+            <label for="endpoint">Endpoint</label>
+            <input type="text" id="endpoint" value="" readonly>
+          </div>
 
-            <div class="feature-card fade-in-up">
-                <div class="feature-icon">⚡</div>
-                <h3>Production Ready</h3>
-                <p>Deployed on Vercel with auto-scaling, thread-safe operations, comprehensive error handling, and 24/7 availability.</p>
-            </div>
-        </div>
-    </section>
+          <div class="form-group">
+            <label for="path">Endpoint Path</label>
+            <select id="path">
+              <option value="/api/v1/detect-scam">/api/v1/detect-scam</option>
+              <option value="/api/v1/conversation">/api/v1/conversation</option>
+              <option value="/health">/health</option>
+            </select>
+          </div>
 
-    <!-- How It Works -->
-    <section class="how-it-works" id="how-it-works">
-        <h2 class="section-title">How It Works</h2>
-        <p class="section-subtitle">Intelligent engagement in 5 strategic phases</p>
-        
-        <div class="steps">
-            <div class="step fade-in-up">
-                <div class="step-number">1</div>
-                <h3>Identification</h3>
-                <p>System detects scam intent and identifies scam type through pattern matching and AI analysis.</p>
-            </div>
+          <div class="form-group">
+            <label for="requestBody">Request Body (JSON)</label>
+            <textarea id="requestBody" placeholder='{"message":"Verify your UPI account immediately"}'></textarea>
+          </div>
 
-            <div class="step fade-in-up">
-                <div class="step-number">2</div>
-                <h3>Build Trust</h3>
-                <p>AI persona establishes credibility and concern, making the scammer believe they're dealing with a real victim.</p>
-            </div>
-
-            <div class="step fade-in-up">
-                <div class="step-number">3</div>
-                <h3>Extract Intel</h3>
-                <p>Intelligently asks questions to extract account numbers, UPI IDs, contact information, and sensitive details.</p>
-            </div>
-
-            <div class="step fade-in-up">
-                <div class="step-number">4</div>
-                <h3>Delay & Probe</h3>
-                <p>Introduces obstacles and hesitations to buy time for analysis while probing for inconsistencies in scammer's story.</p>
-            </div>
-
-            <div class="step fade-in-up">
-                <div class="step-number">5</div>
-                <h3>Safe Exit</h3>
-                <p>Gracefully exits conversation while suggesting reporting to authorities. All intelligence extracted and logged.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- API Documentation -->
-    <section class="api-docs" id="api">
-        <h2 class="section-title">API Endpoints</h2>
-        <p class="section-subtitle">RESTful API with authentication and comprehensive response formats</p>
-        
-        <div class="api-grid">
-            <div class="endpoint fade-in-up">
-                <div class="endpoint-method">GET/POST</div>
-                <div class="endpoint-path">/</div>
-                <div class="endpoint-desc">Health check endpoint. Returns status and service information.</div>
-            </div>
-
-            <div class="endpoint fade-in-up">
-                <div class="endpoint-method">POST</div>
-                <div class="endpoint-path">/api/v1/detect-scam</div>
-                <div class="endpoint-desc">Detect if a message is a scam. Requires message in request body.</div>
-            </div>
-
-            <div class="endpoint fade-in-up">
-                <div class="endpoint-method">POST</div>
-                <div class="endpoint-path">/api/v1/conversation</div>
-                <div class="endpoint-desc">Create a new conversation with a persona. Returns conversation_id.</div>
-            </div>
-
-            <div class="endpoint fade-in-up">
-                <div class="endpoint-method">POST</div>
-                <div class="endpoint-path">/api/v1/conversation/{id}/message</div>
-                <div class="endpoint-desc">Send scammer message and get AI response with strategy and extracted intelligence.</div>
-            </div>
-
-            <div class="endpoint fade-in-up">
-                <div class="endpoint-method">GET</div>
-                <div class="endpoint-path">/api/v1/conversation/{id}</div>
-                <div class="endpoint-desc">Retrieve full conversation state, history, and extracted intelligence.</div>
-            </div>
+          <button class="btn btn-primary" style="width:100%;" onclick="testAPI()">Send Request</button>
         </div>
 
-        <div style="margin-top: 3rem; padding: 2rem; background: rgba(255, 255, 255, 0.05); border-radius: 12px; text-align: left;">
-            <h3 style="margin-bottom: 1rem;">Authentication</h3>
-            <p style="margin-bottom: 1rem;">All endpoints (except /) require the X-API-Key header:</p>
-            <code style="background: rgba(0, 0, 0, 0.3); padding: 1rem; border-radius: 6px; display: block; color: #00ccff;">
-X-API-Key: test_key_12345
-            </code>
+        <div class="tester-right">
+          <h3 style="margin-bottom:12px;">Response</h3>
+          <div id="response" class="response-box">Ready.
+Choose a path, edit JSON if needed, then send.</div>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <!-- Live Tester -->
-    <section class="live-tester" id="tester">
-        <h2 class="section-title">Live API Tester</h2>
-        <p class="section-subtitle">Test the API in real-time</p>
-        
-        <div class="tester-container">
-            <div class="form-group">
-                <label>API Key</label>
-                <input type="text" id="apiKey" value="test_key_12345" readonly>
-            </div>
+  <footer>
+    <div class="wrap">
+      <p>Agentic Honeypot | Adaptive deception and scam intelligence platform</p>
+    </div>
+  </footer>
 
-            <div class="form-group">
-                <label>Endpoint</label>
-                <input type="text" id="endpoint" value="https://ai-agentic-honeypot.vercel.app" readonly>
-            </div>
+  <script>
+    async function testAPI() {
+      const apiKey = document.getElementById("apiKey").value;
+      const endpoint = document.getElementById("endpoint").value;
+      const path = document.getElementById("path").value;
+      const requestBody = document.getElementById("requestBody").value;
+      const responseBox = document.getElementById("response");
+      const url = endpoint + path;
 
-            <div class="form-group">
-                <label>Endpoint Path</label>
-                <select id="path" style="width: 100%; padding: 0.8rem; border: 2px solid var(--border); border-radius: 8px;">
-                    <option value="/api/v1/detect-scam">/api/v1/detect-scam</option>
-                    <option value="/api/v1/conversation">/api/v1/conversation</option>
-                    <option value="/">/health</option>
-                </select>
-            </div>
+      if (!apiKey || !endpoint) {
+        responseBox.textContent = "Error: API key and endpoint are required";
+        return;
+      }
 
-            <div class="form-group">
-                <label>Request Body (JSON)</label>
-                <textarea id="requestBody" rows="5" placeholder='{"message": "Verify your UPI account immediately"}'></textarea>
-            </div>
+      try {
+        responseBox.textContent = "Sending request...";
 
-            <button class="btn btn-primary" style="width: 100%; padding: 1rem;" onclick="testAPI()">
-                Send Request
-            </button>
-
-            <div id="response" class="response-box"></div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h4>Product</h4>
-                <ul>
-                    <li><a href="#features">Features</a></li>
-                    <li><a href="#api">API Docs</a></li>
-                    <li><a href="https://ai-agentic-honeypot.vercel.app/" target="_blank">Live API</a></li>
-                    <li><a href="#">GitHub</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-section">
-                <h4>Company</h4>
-                <ul>
-                    <li><a href="#">About Us</a></li>
-                    <li><a href="#">Blog</a></li>
-                    <li><a href="#">Careers</a></li>
-                    <li><a href="#">Contact</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-section">
-                <h4>Resources</h4>
-                <ul>
-                    <li><a href="#">Documentation</a></li>
-                    <li><a href="#">Tutorial</a></li>
-                    <li><a href="#">FAQ</a></li>
-                    <li><a href="#">Support</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-section">
-                <h4>Legal</h4>
-                <ul>
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">Terms of Service</a></li>
-                    <li><a href="#">Security</a></li>
-                    <li><a href="#">Compliance</a></li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="footer-bottom">
-            <p>&copy; 2026 Agentic Honeypot. All rights reserved. Built with ❤️ for cybersecurity.</p>
-        </div>
-    </footer>
-
-    <script>
-        async function testAPI() {
-            const apiKey = document.getElementById('apiKey').value;
-            const endpoint = document.getElementById('endpoint').value;
-            const path = document.getElementById('path').value;
-            const requestBody = document.getElementById('requestBody').value;
-            const responseBox = document.getElementById('response');
-
-            const url = endpoint + path;
-
-            if (!apiKey || !endpoint) {
-                responseBox.classList.add('show');
-                responseBox.textContent = 'Error: API key and endpoint are required';
-                return;
-            }
-
-            try {
-                responseBox.classList.add('show');
-                responseBox.textContent = 'Sending request...';
-
-                const options = {
-                    method: path === '/' ? 'GET' : 'POST',
-                    headers: {
-                        'X-API-Key': apiKey,
-                        'Content-Type': 'application/json'
-                    }
-                };
-
-                if (path !== '/' && requestBody) {
-                    try {
-                        options.body = JSON.stringify(JSON.parse(requestBody));
-                    } catch (e) {
-                        responseBox.textContent = 'Error: Invalid JSON in request body';
-                        return;
-                    }
-                }
-
-                const response = await fetch(url, options);
-                const data = await response.json();
-
-                responseBox.textContent = JSON.stringify(data, null, 2);
-            } catch (error) {
-                responseBox.classList.add('show');
-                responseBox.textContent = `Error: ${error.message}`;
-            }
-        }
-
-        document.getElementById('path').addEventListener('change', function() {
-            const requestBody = document.getElementById('requestBody');
-            
-            switch(this.value) {
-                case '/api/v1/detect-scam':
-                    requestBody.value = '{"message": "Verify your UPI account immediately"}';
-                    break;
-                case '/api/v1/conversation':
-                    requestBody.value = '{"persona_name": "victim_001"}';
-                    break;
-                case '/':
-                    requestBody.value = '';
-                    break;
-            }
-        });
-
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -100px 0px'
+        const options = {
+          method: path === "/health" ? "GET" : "POST",
+          headers: {
+            "X-API-Key": apiKey,
+            "Content-Type": "application/json"
+          }
         };
 
-        const observer = new IntersectionObserver(function(entries) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('fade-in-up');
-                }
-            });
-        }, observerOptions);
+        if (path !== "/health" && requestBody) {
+          try {
+            options.body = JSON.stringify(JSON.parse(requestBody));
+          } catch (error) {
+            responseBox.textContent = "Error: Invalid JSON in request body";
+            return;
+          }
+        }
 
-        document.querySelectorAll('.feature-card, .step, .endpoint').forEach(el => {
-            observer.observe(el);
+        const response = await fetch(url, options);
+        const contentType = response.headers.get("content-type") || "";
+
+        if (contentType.includes("application/json")) {
+          const data = await response.json();
+          responseBox.textContent = JSON.stringify(data, null, 2);
+          return;
+        }
+
+        responseBox.textContent = await response.text();
+      } catch (error) {
+        responseBox.textContent = "Error: " + error.message;
+      }
+    }
+
+    document.getElementById("path").addEventListener("change", function () {
+      const requestBody = document.getElementById("requestBody");
+
+      switch (this.value) {
+        case "/api/v1/detect-scam":
+          requestBody.value = '{"message": "Verify your UPI account immediately"}';
+          break;
+        case "/api/v1/conversation":
+          requestBody.value = '{"persona_name": "victim_001"}';
+          break;
+        case "/health":
+          requestBody.value = "";
+          break;
+        default:
+          requestBody.value = "";
+          break;
+      }
+    });
+
+    document.getElementById("endpoint").value = window.location.origin;
+    document.getElementById("requestBody").value = '{"message": "Verify your UPI account immediately"}';
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+          }
         });
-    </script>
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -60px 0px" }
+    );
+
+    document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+  </script>
 </body>
 </html>
